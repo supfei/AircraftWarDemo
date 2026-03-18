@@ -34,6 +34,7 @@ public class ImageManager {
     public static Bitmap BACKGROUND3_IMAGE;
     public static Bitmap BACKGROUND4_IMAGE;
     public static Bitmap BACKGROUND5_IMAGE;
+    public static Bitmap BACKGROUND_START_IMAGE;
     public static Bitmap HERO_IMAGE;
     public static Bitmap HERO_BULLET_IMAGE;
     public static Bitmap ENEMY_BULLET_IMAGE;
@@ -55,6 +56,7 @@ public class ImageManager {
             BACKGROUND3_IMAGE = loadBitmap("bg3");
             BACKGROUND4_IMAGE = loadBitmap("bg4");
             BACKGROUND5_IMAGE = loadBitmap("bg5");
+            BACKGROUND_START_IMAGE = loadBitmap("bg_start");
 
             HERO_IMAGE = loadBitmap("hero");
             MOB_ENEMY_IMAGE = loadBitmap("mob");
@@ -135,6 +137,7 @@ public class ImageManager {
         recycleBitmap(BACKGROUND3_IMAGE);
         recycleBitmap(BACKGROUND4_IMAGE);
         recycleBitmap(BACKGROUND5_IMAGE);
+        recycleBitmap(BACKGROUND_START_IMAGE);
         recycleBitmap(HERO_IMAGE);
         recycleBitmap(HERO_BULLET_IMAGE);
         recycleBitmap(ENEMY_BULLET_IMAGE);

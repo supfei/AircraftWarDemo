@@ -1,21 +1,29 @@
 // MainActivity.java
 package com.example.aircraftwardemo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.aircraftwardemo.view.GameView;
+import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity {
 
     private GameView gameView;
+    public static Socket socket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // 获取从主菜单传过来的游戏模式
+        Intent intent = getIntent();
+        String gameMode = intent.getStringExtra("game_mode");
+        // 如果没有传过来，默认为简单模式
+        if (gameMode == null) {gameMode = "easy";}
+
         // 创建GameView（简单模式）
-        gameView = new GameView(this, "easy");
+        gameView = new GameView(this, gameMode);
 
         // 设置为全屏
         getWindow().setFlags(
