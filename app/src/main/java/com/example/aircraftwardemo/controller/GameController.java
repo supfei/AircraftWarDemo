@@ -63,13 +63,13 @@ public class GameController {
     protected int enemyMaxNumber = 7; // 敌机最大数量，子类可覆写 getEnemyMaxNumber()
 
     // 新增：游戏界面相关
-    private int screenWidth;
-    private int screenHeight;
+    protected int screenWidth;
+    protected int screenHeight;
 
     // 画笔对象（用于绘制）
-    private Paint paint = new Paint();
+    protected Paint paint = new Paint();
     // 新增：触摸控制器
-    private TouchController touchController;
+    protected TouchController touchController;
 
     public GameController (boolean soundEnabled, Context context) {
 //新：传context
@@ -216,7 +216,7 @@ public class GameController {
 
     protected void drawBackground(Canvas canvas) {
         // 默认使用背景1，子类可以重写
-        Bitmap background = ImageManager.BACKGROUND_IMAGE;
+        Bitmap background = ImageManager.BACKGROUND1_IMAGE;
         if (background != null) {
             // 简单平铺背景
             int bgHeight = background.getHeight();
