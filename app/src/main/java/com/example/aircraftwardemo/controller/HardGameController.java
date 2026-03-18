@@ -1,8 +1,12 @@
 package com.example.aircraftwardemo.controller;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 
 import com.example.aircraftwardemo.manager.EnemySpawnManager;
+import com.example.aircraftwardemo.manager.ImageManager;
 
 public class HardGameController extends GameController {
 
@@ -62,6 +66,27 @@ public class HardGameController extends GameController {
             eliteConfig.setHp(eliteConfig.getHp() + 5);
             plusConfig.setHp(plusConfig.getHp() + 5);
             bossConfig.setHp(bossConfig.getHp() + 50);
+        }
+    }
+
+    @Override
+    protected void drawBackground(Canvas canvas) {
+        Bitmap background = null;
+
+        if (this.score > 2000) {
+            background = ImageManager.BACKGROUND5_IMAGE;
+        } else {
+            background = ImageManager.BACKGROUND3_IMAGE;
+        }
+        if (background != null) {
+            // 简单平铺背景
+            int bgHeight = background.getHeight();
+            for (int y = 0; y < screenHeight; y += bgHeight) {
+                canvas.drawBitmap(background, 0, y, paint);
+            }
+        } else {
+            // 没有背景图片时使用纯色
+            canvas.drawColor(Color.BLACK);
         }
     }
 }

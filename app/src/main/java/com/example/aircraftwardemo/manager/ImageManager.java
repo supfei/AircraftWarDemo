@@ -29,7 +29,7 @@ public class ImageManager {
      */
     private static final Map<String, Bitmap> CLASSNAME_IMAGE_MAP = new HashMap<>();
 
-    public static Bitmap BACKGROUND_IMAGE;
+    public static Bitmap BACKGROUND1_IMAGE;
     public static Bitmap BACKGROUND2_IMAGE;
     public static Bitmap BACKGROUND3_IMAGE;
     public static Bitmap BACKGROUND4_IMAGE;
@@ -50,7 +50,7 @@ public class ImageManager {
     private static void loadImages() {
         try {
             // 使用Android方式加载图片
-            BACKGROUND_IMAGE = loadBitmap("bg1");  // 对应原来的bg.jpg
+            BACKGROUND1_IMAGE = loadBitmap("bg1");  // 对应原来的bg.jpg
             BACKGROUND2_IMAGE = loadBitmap("bg2");
             BACKGROUND3_IMAGE = loadBitmap("bg3");
             BACKGROUND4_IMAGE = loadBitmap("bg4");
@@ -130,7 +130,7 @@ public class ImageManager {
      * 资源释放方法（Android需要手动管理Bitmap内存）
      */
     public static void recycleAll() {
-        recycleBitmap(BACKGROUND_IMAGE);
+        recycleBitmap(BACKGROUND1_IMAGE);
         recycleBitmap(BACKGROUND2_IMAGE);
         recycleBitmap(BACKGROUND3_IMAGE);
         recycleBitmap(BACKGROUND4_IMAGE);

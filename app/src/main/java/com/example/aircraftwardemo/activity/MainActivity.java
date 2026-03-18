@@ -1,5 +1,5 @@
 // MainActivity.java
-package com.example.aircraftwardemo;
+package com.example.aircraftwardemo.activity;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // 创建GameView（简单模式）
-        gameView = new GameView(this, "easy");
+        gameView = new GameView(this, "hard");
 
         // 设置为全屏
         getWindow().setFlags(

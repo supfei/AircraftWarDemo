@@ -1,8 +1,12 @@
 package com.example.aircraftwardemo.controller;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 
 import com.example.aircraftwardemo.manager.EnemySpawnManager;
+import com.example.aircraftwardemo.manager.ImageManager;
 
 public class NormalGameController extends GameController {
 
@@ -45,6 +49,28 @@ public class NormalGameController extends GameController {
 
             // 动态增加敌机上限
             dynamicEnemyMaxNumber += 1;
+        }
+    }
+
+
+    @Override
+    protected void drawBackground(Canvas canvas) {
+        Bitmap background = null;
+
+        if (this.score > 2000) {
+            background = ImageManager.BACKGROUND4_IMAGE;
+        } else {
+            background = ImageManager.BACKGROUND2_IMAGE;
+        }
+        if (background != null) {
+            // 简单平铺背景
+            int bgHeight = background.getHeight();
+            for (int y = 0; y < screenHeight; y += bgHeight) {
+                canvas.drawBitmap(background, 0, y, paint);
+            }
+        } else {
+            // 没有背景图片时使用纯色
+            canvas.drawColor(Color.BLACK);
         }
     }
 }
