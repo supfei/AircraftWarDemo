@@ -1,5 +1,5 @@
 // MainActivity.java
-package com.example.aircraftwardemo;
+package com.example.aircraftwardemo.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
