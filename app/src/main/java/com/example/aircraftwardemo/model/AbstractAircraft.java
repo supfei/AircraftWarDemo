@@ -4,7 +4,7 @@ import com.example.aircraftwardemo.strategy.ShootStrategy;
 import com.example.aircraftwardemo.strategy.StraightShootStrategy;
 
 import java.util.List;
-
+//test
 /**
  * 所有种类飞机的抽象父类：
  * 敌机（BOSS, ELITE, MOB），英雄飞机
