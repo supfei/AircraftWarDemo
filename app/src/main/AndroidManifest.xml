@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AircraftWarDemo">
         <activity
-            android:name=".activity.MainActivity"
+            android:name=".activity.MainMenuActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
