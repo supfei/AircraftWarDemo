@@ -23,7 +23,7 @@
 
         <!-- 游戏界面 -->
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:exported="false" />
     </application>
 
