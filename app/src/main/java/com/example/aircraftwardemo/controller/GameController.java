@@ -1,21 +1,31 @@
 package com.example.aircraftwardemo.controller;
 
+import static java.security.AccessController.getContext;
+
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.util.Log;
 
+import com.example.aircraftwardemo.data.ScoreRecord;
 import com.example.aircraftwardemo.factory.*;
 import com.example.aircraftwardemo.manager.*;
 import com.example.aircraftwardemo.model.*;
+import com.example.aircraftwardemo.network.ScoreRepository;
 import com.example.aircraftwardemo.observer.Observer;
 
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -77,15 +87,16 @@ public class GameController {
 
         // 初始化游戏对象
         this.heroAircraft = HeroAircraft.getInstance();
+        this.heroAircraft.reset();
         this.heroAircraft.setGame(this);
         // 初始化触摸控制器
         this.touchController = new TouchController(heroAircraft);
 
 
-        this.enemyAircrafts = new LinkedList<>();
-        this.heroBullets = new LinkedList<>();
-        this.enemyBullets = new LinkedList<>();
-        this.allProps = new LinkedList<>();
+        this.enemyAircrafts = new CopyOnWriteArrayList<>();
+        this.heroBullets = new CopyOnWriteArrayList<>();
+        this.enemyBullets = new CopyOnWriteArrayList<>();
+        this.allProps = new CopyOnWriteArrayList<>();
         this.soundEnabled = soundEnabled;
 
         // 获取屏幕尺寸
@@ -289,6 +300,27 @@ public class GameController {
         return gameOverFlag;
     }
 
+    public interface GameOverListener {
+        void onGameOver(int finalScore);
+    }
+
+    // 添加成员变量
+    private GameOverListener gameOverListener;
+
+    // 添加setter方法
+    public void setGameOverListener(GameOverListener listener) {
+        this.gameOverListener = listener;
+    }
+
+    public void onGameOver() {
+        int finalScore = getScore();
+
+        // 通知监听器
+        if (gameOverListener != null) {
+            gameOverListener.onGameOver(finalScore);
+        }
+    }
+
     public int getScore() {
         return score;
     }
@@ -298,10 +330,57 @@ public class GameController {
     }
 
     public void cleanup() {
+        Log.d("GameController", "开始清理游戏控制器");
+
+        // 停止执行器服务
         if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdown();
+            try {
+                executorService.shutdown();
+                if (!executorService.awaitTermination(1, TimeUnit.SECONDS)) {
+                    executorService.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                executorService.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
         }
+
+        // 清理列表
+        if (enemyAircrafts != null) {
+            enemyAircrafts.clear();
+        }
+        if (heroBullets != null) {
+            heroBullets.clear();
+        }
+        if (enemyBullets != null) {
+            enemyBullets.clear();
+        }
+        if (allProps != null) {
+            allProps.clear();
+        }
+
+        // 重置游戏状态
+        gameOverFlag = true;
+
+        // 移除监听器
+        gameOverListener = null;
+
+        resetTime();
+
+        // 清理触摸控制器
+        if (touchController != null) {
+            // 如果TouchController有cleanup方法，调用它
+        }
+
+        Log.d("GameController", "游戏控制器清理完成");
     }
+    protected void resetTime() {
+        this.time = 0;
+        enemyShootScheduler.resetTimer();
+        enemySpawnScheduler.resetTimer();
+        heroShootScheduler.resetTimer();
+    }
+
 
 
     // ========== 抽象方法（由子类实现，控制不同难度行为） ==========
@@ -515,15 +594,35 @@ public class GameController {
 
     /** 检查游戏是否结束（默认：英雄死亡） */
     protected void checkGameOver() {
-        if (heroAircraft.getHp() <= 0) {
+        if (heroAircraft.getHp() <= 0 && !gameOverFlag) {
             if (soundEnabled) {
-//                getMusicManager().playGameOver();
-//                getMusicManager().stopBackgroundMusic();
+                // 音效相关代码
             }
             System.out.println("英雄机死亡，游戏结束！");
-//            printScoreboard();
+
             gameOverFlag = true;
-            executorService.shutdown();
+
+            // 确保在主线程调用onGameOver
+            if (gameOverListener != null) {
+                // 获取主线程Handler
+                Activity activity = (Activity) context;
+                if (activity != null) {
+                    activity.runOnUiThread(() -> {
+                        gameOverListener.onGameOver(getScore());
+                    });
+                } else {
+                    // 如果无法获取Activity，尝试其他方式
+                    new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                        if (gameOverListener != null) {
+                            gameOverListener.onGameOver(getScore());
+                        }
+                    });
+                }
+            }
+
+            if (executorService != null && !executorService.isShutdown()) {
+                executorService.shutdown();
+            }
         }
     }
 

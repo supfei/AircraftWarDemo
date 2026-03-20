@@ -3,6 +3,9 @@ package com.example.aircraftwardemo.data;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import android.content.Context;
+import android.os.Environment;
+import android.util.Log;
 
 /**
  * @author 有朝宿云
@@ -11,12 +14,31 @@ import java.util.List;
 public class ScoreDaoImpl implements ScoreDao {
 
     private List<ScoreRecord> scores;
-    private static final String FILE_NAME = "data/scores.csv";
+    private Context context;
+    private  String FILE_NAME = "scores.csv";
 
-    public ScoreDaoImpl() {
+    // 修改构造函数，接收Context参数
+    public ScoreDaoImpl(Context context) {
+        this.context = context.getApplicationContext();  // 使用Application Context避免内存泄漏
         scores = loadScoresFromCSV();
     }
 
+    // 确保使用context.getFilesDir()获取内部存储路径
+    private String getFilePath() {
+        if (context == null) {
+            Log.e("ScoreDaoImpl", "Context is null!");
+            return "scores.csv";  // 返回默认文件名
+
+            // 回退方案：使用外部存储
+//            File externalDir = Environment.getExternalStorageDirectory();
+//            File file = new File(externalDir, "AircraftWar/scores.csv");
+//            return file.getAbsolutePath();
+        }
+        File dir = context.getFilesDir();
+        File file = new File(dir, FILE_NAME);
+        Log.d("ScoreDaoImpl", "File path: " + file.getAbsolutePath());
+        return file.getAbsolutePath();
+    }
     @Override
     public void addScore(ScoreRecord scoreRecord) {
         scores.add(scoreRecord);
@@ -45,7 +67,11 @@ public class ScoreDaoImpl implements ScoreDao {
     // ==================== CSV 文件读取 ====================
     private List<ScoreRecord> loadScoresFromCSV() {
         List<ScoreRecord> loadedScores = new ArrayList<>();
-        File file = new File(FILE_NAME);
+        if (context == null) {
+            Log.e("ScoreDaoImpl", "Context is null in loadScoresFromCSV");
+            return loadedScores;
+        }
+        File file = new File(getFilePath());  // 使用getFilePath()
 
         // 如果文件不存在或为空，返回空列表
         if (!file.exists() || file.length() == 0) {
@@ -86,7 +112,11 @@ public class ScoreDaoImpl implements ScoreDao {
 
     // ==================== CSV 文件写入 ====================
     private void saveScoresToCSV() {
-        File file = new File(FILE_NAME);
+        if (context == null) {
+            Log.e("ScoreDaoImpl", "Context is null in saveScoresToCSV");
+            return;
+        }
+        File file = new File(getFilePath());  // 使用getFilePath()
 
         // 确保 data 目录存在
         File dir = file.getParentFile();

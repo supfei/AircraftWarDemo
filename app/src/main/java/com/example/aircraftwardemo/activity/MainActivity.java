@@ -3,7 +3,11 @@ package com.example.aircraftwardemo.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.aircraftwardemo.model.HeroAircraft;
 import com.example.aircraftwardemo.view.GameView;
 import java.net.Socket;
 
@@ -38,27 +42,36 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        // Activity暂停时，可以暂停游戏
+        Log.d("MainActivity", "Activity暂停");
+
         if (gameView != null) {
-            // 可以添加暂停逻辑
+            gameView.pauseGame();
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // Activity恢复时，可以恢复游戏
+        Log.d("MainActivity", "Activity恢复");
+
         if (gameView != null) {
-            // 可以添加恢复逻辑
+            gameView.resumeGame();
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // 清理资源
+        Log.d("MainActivity", "Activity销毁");
+
         if (gameView != null) {
-            // 可以添加清理逻辑
+            gameView.cleanup();
+            gameView = null;
         }
+
+        // 清理HeroAircraft单例（如果需要重新开始游戏）
+        HeroAircraft.clearInstance();
     }
+
+
 }

@@ -89,4 +89,10 @@ public class HardGameController extends GameController {
             canvas.drawColor(Color.BLACK);
         }
     }
+    @Override
+    protected void resetTime() {
+        this.time = 0;
+        this.lastDifficultyUpdateTime = 0;
+        this.lastEnemyAttrUpdateTime = 0;
+    }
 }

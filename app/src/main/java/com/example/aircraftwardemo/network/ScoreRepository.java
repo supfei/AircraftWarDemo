@@ -19,7 +19,7 @@ public class ScoreRepository {
 
     private ScoreRepository(Context context) {
         this.context = context.getApplicationContext();
-        this.localDao = new ScoreDaoImpl();
+        this.localDao = new ScoreDaoImpl(this.context);
         this.networkManager = new ScoreNetworkManager(context);
     }
 
