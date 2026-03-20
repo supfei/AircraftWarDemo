@@ -77,8 +77,22 @@ public class MainMenuActivity extends AppCompatActivity {
                 startGame("hard");
             }
         });
-    }
 
+        Button btnRanking = findViewById(R.id.btn_ranking);
+        btnRanking.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startRankingActivity();
+            }
+        });
+
+    }
+    // 添加方法
+    private void startRankingActivity() {
+        Intent intent = new Intent(MainMenuActivity.this, GlobalRankingActivity.class);
+        startActivity(intent);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
     private void startGame(String mode) {
         Intent intent = new Intent(MainMenuActivity.this, MainActivity.class);
         intent.putExtra("game_mode", mode);

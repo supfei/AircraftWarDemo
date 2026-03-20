@@ -1,5 +1,7 @@
 package com.example.aircraftwardemo.controller;
 
+import android.util.Log;
+
 /**
  * 通用的行为调度器（定时触发器）
  * 用于控制某一行为（如敌机生成、射击等）以固定的时间间隔周期性执行。
@@ -94,5 +96,12 @@ public class BehaviorScheduler {
      */
     public void resetTimer() {
         timer = 0f;
+        Log.d("BehaviorScheduler", "调度器已重置，timer=0");
     }
+
+    // 获取timer的方法（用于调试）
+    public float getTimer() {
+        return timer;
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.example.aircraftwardemo.model;
 
+import android.util.Log;
+
 import com.example.aircraftwardemo.controller.GameConfig;
 import com.example.aircraftwardemo.controller.GameController;
 import com.example.aircraftwardemo.manager.ImageManager;
@@ -47,42 +49,63 @@ public class HeroAircraft extends AbstractAircraft {
         this.shootStrategyManager = new ShootStrategyManager(this);
     }
 
-    //单例模式,饿汉式9.25
-    private static final HeroAircraft instance = new HeroAircraft(
-            GameConfig.getScreenWidth() / 2,
-            GameConfig.getScreenHeight() - ImageManager.HERO_IMAGE.getHeight() ,
-            0, 0, 1000);
+//    //单例模式，懒汉式
+//    private static final HeroAircraft instance = new HeroAircraft(
+//            GameConfig.getScreenWidth() / 2,
+//            GameConfig.getScreenHeight() - ImageManager.HERO_IMAGE.getHeight() ,
+//            0, 0, 1000);
+//
+//    public static HeroAircraft getInstance() {
+//        return instance;
+//    }
+    // 单例模式，硬汉式
+private static HeroAircraft instance = null;  // 改为懒汉式
 
     public static HeroAircraft getInstance() {
+        if (instance == null) {
+            instance = new HeroAircraft(
+                    GameConfig.getScreenWidth() / 2,
+                    GameConfig.getScreenHeight() - ImageManager.HERO_IMAGE.getHeight(),
+                    0, 0, 1000
+            );
+        }
         return instance;
     }
 
-    /**攻击方式 */
+    // 添加清理方法
+    public static void clearInstance() {
+        synchronized (HeroAircraft.class) {
+            instance = null;
+            Log.d("HeroAircraft", "英雄机单例已清理");
+        }
+    }
 
-    /**
-     * 子弹一次发射数量shootNum = 1;
-     */
-//    /**
-//     * 切换为直射模式（默认）
-//     */
-//    public void setShootModeToStraight() {
-//        shootStrategyManager.applyStraightEffect();
-//    }
-//
-//    /**
-//     * 切换为散射模式（道具效果）
-//     */
-//    public void setShootModeToScatter() {
-//        shootStrategyManager.applyScatterEffect();
-//    }
-//
-//    /**
-//     * 切换为环射模式（道具效果）
-//     */
-//    public void setShootModeToCircle() {
-//        shootStrategyManager.applyCircleEffect();
-//    }
+    // HeroAircraft.java
+    public void reset() {
+        synchronized (this) {
+            setHp(1000);  // 重置生命值
+            setShootNum(1);
+            setPower(30);
+// 重置位置
+            int screenWidth = GameConfig.getScreenWidth();
+            int screenHeight = GameConfig.getScreenHeight();
+            int x = screenWidth / 2;
+            int y = screenHeight - 200;
+            if (ImageManager.HERO_IMAGE != null) {
+                y = screenHeight - ImageManager.HERO_IMAGE.getHeight() - 50;
+            } else {
+                Log.e("HeroAircraft", "reset:图片未加载 ");
+            }
 
+            this.setLocation(x, y);
+            // 重置射击策略
+            if (shootStrategyManager != null) {
+                shootStrategyManager.applyStraightEffect();
+            }
+
+            Log.d("HeroAircraft", "重置完成: HP=" + getHp() + ", 位置=(" + x + "," + y + ")");
+        }
+    }
     public ShootStrategyManager getShootStrategyManager() {
         return shootStrategyManager;
     }

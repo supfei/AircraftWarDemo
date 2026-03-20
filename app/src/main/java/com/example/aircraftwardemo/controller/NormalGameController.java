@@ -34,7 +34,7 @@ public class NormalGameController extends GameController {
     @Override
     protected void onTimeIncrease() {
         int currentTime = time;
-        if (currentTime - lastDifficultyUpdateTime >= 1000) {
+        if (currentTime - lastDifficultyUpdateTime >= 10000) {
             lastDifficultyUpdateTime = currentTime;
 
             // 提升敌机生成频率
@@ -72,5 +72,10 @@ public class NormalGameController extends GameController {
             // 没有背景图片时使用纯色
             canvas.drawColor(Color.BLACK);
         }
+    }
+    @Override
+    protected void resetTime() {
+        this.time = 0;
+        this.lastDifficultyUpdateTime = 0;
     }
 }

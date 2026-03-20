@@ -43,4 +43,12 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    // 网络库依赖
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)  // 可选，用于调试
+    implementation(libs.gson)
+    implementation(libs.moshi)  // 可选，如果你用Moshi而不是Gson
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+
 }
