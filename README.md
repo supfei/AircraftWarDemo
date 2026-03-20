@@ -90,8 +90,8 @@ public void surfaceCreated(SurfaceHolder holder) {
 - **其他应用覆盖**：如分享菜单、文件选择器等
 
 ##### 接下来的改进方向：
-1.区分暂停和停止，现在只有游戏终止处理，并没有游戏暂停处理。
-2.更解耦：创建游戏模式管理工厂；有多余的精力考虑把draw逻辑从GameController移出。
-3.生命周期：游戏线程应该与Surface绑定，而不是与Activity绑定。
-Activity生命周期: onCreate → onStart → onResume → onPause → onStop → onDestroy
-Surface生命周期: surfaceCreated → surfaceChanged → surfaceDestroyed
+- 1.区分暂停和停止，现在只有游戏终止处理，并没有游戏暂停处理。
+- 2.更解耦：创建游戏模式管理工厂；有多余的精力考虑把draw逻辑从GameController移出。
+- 3.生命周期：游戏线程应该与Surface绑定，而不是与Activity绑定。
+    - Activity生命周期: onCreate → onStart → onResume → onPause → onStop → onDestroy
+    - Surface生命周期: surfaceCreated → surfaceChanged → surfaceDestroyed
