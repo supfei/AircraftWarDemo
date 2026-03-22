@@ -95,3 +95,7 @@ public void surfaceCreated(SurfaceHolder holder) {
 - 3.生命周期：游戏线程应该与Surface绑定，而不是与Activity绑定。
     - Activity生命周期: onCreate → onStart → onResume → onPause → onStop → onDestroy
     - Surface生命周期: surfaceCreated → surfaceChanged → surfaceDestroyed
+ ## 0322：使用工厂模式管理不同难度的游戏生成
+ ##### 小优化：注释所有了sout，给属性增加添加了上限，缓解渲染掉帧
+ ##### 待解决大问题：游戏在中后期，每一秒钟都在创建和销毁成百上千个对象。系统内存扛不住这种消耗，触发了频繁的垃圾回收（GC）。GC 运行时会暂停所有线程（包括你的游戏渲染线程），这会造成肉眼可见的严重卡顿（内存抖动）。
+ ##### 暂时的想法：使用对象池
