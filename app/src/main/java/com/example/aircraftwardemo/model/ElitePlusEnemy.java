@@ -22,6 +22,6 @@ public class ElitePlusEnemy extends EnemyAircraft{
     public void update(PropBomb bomber) {
         // 超级精英敌机被炸弹击中时，只扣血，不消失
         this.decreaseHp(15);
-        System.out.println("超级精英敌机被炸弹击中，HP-15，未被清除！");
+        // System.out.println("超级精英敌机被炸弹击中，HP-15，未被清除！");
     }
 }

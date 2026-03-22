@@ -27,6 +27,7 @@ import com.example.aircraftwardemo.controller.GameController;
 import com.example.aircraftwardemo.controller.HardGameController;
 import com.example.aircraftwardemo.controller.NormalGameController;
 import com.example.aircraftwardemo.data.ScoreRecord;
+import com.example.aircraftwardemo.factory.GameControllerFactory;
 import com.example.aircraftwardemo.manager.ImageManager;
 import com.example.aircraftwardemo.model.HeroAircraft;
 import com.example.aircraftwardemo.network.ScoreRepository;
@@ -66,6 +67,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     // 游戏控制器
     private GameController gameController;
     private String difficulty = "hard";
+    private boolean soundEnabled = false;
 
     // 屏幕尺寸
     private int screenWidth;
@@ -81,9 +83,10 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     /**
      * 代码中创建View时调用
      */
-    public GameView(Context context, String difficulty) {
+    public GameView(Context context, String difficulty, boolean soundEnabled) {
         super(context);
         this.difficulty = difficulty;
+        this.soundEnabled = soundEnabled;
         initView(context);
     }
 
@@ -303,59 +306,41 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 
     @Override
     public void run() {
-        Log.d("GameView", "游戏线程启动");
-
         long lastTime = System.nanoTime();
-        double nsPerUpdate = 1000000000.0 / 60.0; // 目标60FPS
+        double nsPerUpdate = 1000000000.0 / 60.0;
         double delta = 0;
         long timer = System.currentTimeMillis();
         int updates = 0;
         int frames = 0;
-        long lastLogTime = System.currentTimeMillis();
 
-        // 游戏主循环
         while (isRunning) {
             long now = System.nanoTime();
             delta += (now - lastTime) / nsPerUpdate;
             lastTime = now;
 
-            // 固定时间步长更新
-            while (delta >= 1) {
+            // 限制最大追赶步数，防止死亡螺旋（最多连续更新6帧）
+            int updateCount = 0;
+            while (delta >= 1 && updateCount < 6) {
                 updateGame();
                 updates++;
                 delta--;
-
-                // 每100次更新记录一次
-                if (updates % 100 == 0) {
-                    long currentTime = System.currentTimeMillis();
-                    if (currentTime - lastLogTime > 1000) { // 每秒最多记录一次
-                        Log.d("GameView", "updateGame调用频率: " + updates + "次/秒");
-                        lastLogTime = currentTime;
-                    }
-                }
+                updateCount++;
             }
 
-            // 渲染游戏
             renderGame();
             frames++;
 
-            // 控制帧率
+            // 精准睡眠控制
             try {
-                long frameTime = (System.nanoTime() - now) / 1000000;
-                long sleepTime = Math.max(0, 16 - frameTime); // 16ms ≈ 60FPS
-
-                // 如果sleepTime太小，说明游戏循环太快
-                if (sleepTime < 5) {
-                    Thread.sleep(5); // 最小睡眠5ms
-                } else {
-                    Thread.sleep(sleepTime);
+                long executionTimeNs = System.nanoTime() - now;
+                long sleepTimeMs = (long) ((1000000000.0 / 60.0 - executionTimeNs) / 1000000);
+                if (sleepTimeMs > 0) {
+                    Thread.sleep(sleepTimeMs);
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                break;
             }
 
-            // 每秒输出一次FPS
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
                 Log.d("GameView", "FPS: " + frames + " | Updates: " + updates);
@@ -363,7 +348,6 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
                 updates = 0;
             }
         }
-
         Log.d("GameView", "游戏线程结束");
     }
 
@@ -439,19 +423,25 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     // ========== 辅助方法 ==========
 
     private void initGameController() {
-        // 根据难度创建不同的游戏控制器
-        switch (difficulty) {
-            case "easy":
-                gameController = new EasyGameController(false, getContext());
-                break;
-            case "normal":
-                gameController = new NormalGameController(false, getContext());
-                break;
-            case "hard":
-                gameController = new HardGameController(false, getContext());
-                break;
-            default:
-                gameController = new EasyGameController(false, getContext());
+//        // 根据难度创建不同的游戏控制器
+//        switch (difficulty) {
+//            case "easy":
+//                gameController = new EasyGameController(false, getContext());
+//                break;
+//            case "normal":
+//                gameController = new NormalGameController(false, getContext());
+//                break;
+//            case "hard":
+//                gameController = new HardGameController(false, getContext());
+//                break;
+//            default:
+//                gameController = new EasyGameController(false, getContext());
+//        }
+        gameController = GameControllerFactory.createController(difficulty, soundEnabled, getContext());
+
+        if (gameController != null) {
+            gameController.setGameOverListener(this);
+            HeroAircraft.getInstance().setGame(gameController);
         }
 
         // 设置屏幕尺寸

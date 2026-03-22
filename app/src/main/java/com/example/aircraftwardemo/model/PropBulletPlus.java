@@ -13,7 +13,7 @@ public class PropBulletPlus extends AbstractProp{
     @Override
     public void applyEffect(HeroAircraft hero) {
         hero.setShootNum(20);
-        System.out.println("PlusFireSupply active!");
+        // System.out.println("PlusFireSupply active!");
         // 1. 获取策略管理器
         ShootStrategyManager strategyManager = hero.getShootStrategyManager();
         if (strategyManager != null) {
@@ -30,7 +30,7 @@ public class PropBulletPlus extends AbstractProp{
                 }
                 hero.setShootNum(1);
                 strategyManager.applyStraightEffect();
-                System.out.println("散射效果结束，已恢复直射。");
+                // System.out.println("散射效果结束，已恢复直射。");
             }).start();
         }
 

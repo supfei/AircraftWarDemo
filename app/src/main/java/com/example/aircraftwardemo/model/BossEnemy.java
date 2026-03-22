@@ -25,6 +25,6 @@ public class BossEnemy extends EnemyAircraft{
     @Override
     public void update(PropBomb bomber) {
         // Boss 敌机免疫炸弹
-        System.out.println("Boss 敌机免疫炸弹效果，不受影响！");
+        // System.out.println("Boss 敌机免疫炸弹效果，不受影响！");
     }
 }

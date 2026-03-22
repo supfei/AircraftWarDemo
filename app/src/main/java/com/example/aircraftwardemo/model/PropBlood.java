@@ -12,6 +12,6 @@ public class PropBlood extends AbstractProp {
     @Override
     public void applyEffect(HeroAircraft hero) {
         hero.increaseHp(20);
-        System.out.println("Hp++");
+        // System.out.println("Hp++");
     }
 }

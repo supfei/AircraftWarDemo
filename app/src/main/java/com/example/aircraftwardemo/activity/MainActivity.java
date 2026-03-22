@@ -25,9 +25,11 @@ public class MainActivity extends AppCompatActivity {
         String gameMode = intent.getStringExtra("game_mode");
         // 如果没有传过来，默认为简单模式
         if (gameMode == null) {gameMode = "easy";}
+        boolean soundEnable = false;
+        intent.getBooleanExtra("music_on",soundEnable);
 
         // 创建GameView（简单模式）
-        gameView = new GameView(this, gameMode);
+        gameView = new GameView(this, gameMode, soundEnable);
 
         // 设置为全屏
         getWindow().setFlags(
