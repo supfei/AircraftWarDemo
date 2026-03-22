@@ -71,6 +71,6 @@ import java.util.Random;
         // 默认行为：普通敌机/精英敌机被炸弹清除
         this.setDestroyedByBomb(true);
         this.vanish();
-        System.out.println("敌机被炸弹清除（观察者）: " + this.getClass().getSimpleName());
+        // System.out.println("敌机被炸弹清除（观察者）: " + this.getClass().getSimpleName());
     }
 }

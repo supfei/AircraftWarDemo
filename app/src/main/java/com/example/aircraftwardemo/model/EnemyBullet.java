@@ -15,6 +15,6 @@ public class EnemyBullet extends BaseBullet implements Observer {
     public void update(PropBomb bomber) {
         // 敌机子弹被炸弹清除
         this.vanish();
-        System.out.println("敌机子弹被炸弹清除: EnemyBullet");
+        // System.out.println("敌机子弹被炸弹清除: EnemyBullet");
     }
 }

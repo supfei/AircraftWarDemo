@@ -112,7 +112,7 @@ public class EnemySpawnManager {
     // ====== 敌机创建方法：调用工厂，并传入对应的 EnemyConfig ======
 
     private EnemyAircraft createMobEnemy(int screenWidth, int screenHeight) {
-        System.out.println("mob");
+        // System.out.println("mob");
         return new MobEnemyFactory().createEnemy(
                 random.nextInt(screenWidth - ImageManager.MOB_ENEMY_IMAGE.getWidth()),
                 random.nextInt(screenHeight * 5 / 100), // 从屏幕顶部区域生成
@@ -121,7 +121,7 @@ public class EnemySpawnManager {
     }
 
     private EnemyAircraft createEliteEnemy(int screenWidth, int screenHeight) {
-        System.out.println("elite");
+        // System.out.println("elite");
         return new EliteEnemyFactory().createEnemy(
                 random.nextInt(screenWidth - ImageManager.ELITE_ENEMY_IMAGE.getWidth()),
                 random.nextInt(screenHeight * 5 / 100),
@@ -130,7 +130,7 @@ public class EnemySpawnManager {
     }
 
     private EnemyAircraft createPlusEnemy(int screenWidth, int screenHeight) {
-        System.out.println("plus");
+        // System.out.println("plus");
         return new ElitePlusEnemyFactory().createEnemy(
                 random.nextInt(screenWidth - ImageManager.ELITE_ENEMY_IMAGE.getWidth()),
                 random.nextInt(screenHeight * 5 / 100),
@@ -139,7 +139,7 @@ public class EnemySpawnManager {
     }
 
     private EnemyAircraft createBoss(int screenWidth, int screenHeight) {
-        System.out.println("boss");
+        // System.out.println("boss");
         return new BossEnemyFactory().createEnemy(
                 random.nextInt(screenWidth - ImageManager.BOSS_ENEMY_IMAGE.getWidth()),
                 random.nextInt(screenHeight * 5 / 100),

@@ -15,7 +15,7 @@ public class PropBullet extends AbstractProp {
         if (hero == null) return;
 
         hero.setShootNum(3);
-        System.out.println("FireSupply active!");
+        // System.out.println("FireSupply active!");
 
         ShootStrategyManager strategyManager = hero.getShootStrategyManager();
         if (strategyManager != null) {
@@ -25,12 +25,12 @@ public class PropBullet extends AbstractProp {
             if (hero.getGame() != null) {
                 hero.getGame().scheduleBuffRestore(hero, strategyManager);
             } else {
-                System.out.println("⚠️ PropBullet: 无法获取 Game 实例，无法调度自动恢复");
+                // System.out.println("⚠️ PropBullet: 无法获取 Game 实例，无法调度自动恢复");
             }
 
-            System.out.println("✅ 已切换为散射模式，Buff 将在 10 秒后自动恢复");
+            // System.out.println("✅ 已切换为散射模式，Buff 将在 10 秒后自动恢复");
         } else {
-            System.out.println("⚠️ PropBullet: 未找到 ShootStrategyManager");
+            // System.out.println("⚠️ PropBullet: 未找到 ShootStrategyManager");
         }
     }
 }

@@ -92,11 +92,10 @@ public class GameController {
         // 初始化触摸控制器
         this.touchController = new TouchController(heroAircraft);
 
-
-        this.enemyAircrafts = new CopyOnWriteArrayList<>();
-        this.heroBullets = new CopyOnWriteArrayList<>();
-        this.enemyBullets = new CopyOnWriteArrayList<>();
-        this.allProps = new CopyOnWriteArrayList<>();
+        this.enemyAircrafts = new LinkedList<>();
+        this.heroBullets = new LinkedList<>();
+        this.enemyBullets = new LinkedList<>();
+        this.allProps = new LinkedList<>();
         this.soundEnabled = soundEnabled;
 
         // 获取屏幕尺寸
@@ -441,7 +440,7 @@ public class GameController {
                         if (enemy instanceof BossEnemy) {
                             if (soundEnabled) {
 //                                getMusicManager().playBackgroundMusic(); // 切回普通背景音乐
-//                                System.out.println("Boss 被击败，切换回普通背景音乐");
+//                                // System.out.println("Boss 被击败，切换回普通背景音乐");
                             }
                             enemySpawnManager.onBossDestroyed(); // Boss 被击败，允许下次生成
                         }
@@ -598,7 +597,7 @@ public class GameController {
             if (soundEnabled) {
                 // 音效相关代码
             }
-            System.out.println("英雄机死亡，游戏结束！");
+            // System.out.println("英雄机死亡，游戏结束！");
 
             gameOverFlag = true;
 
@@ -654,7 +653,7 @@ public class GameController {
         }
         for (EnemyAircraft e : destroyed) {
             score += e.getScore();
-            System.out.println("炸弹击毁敌机，得分：" + e.getScore());
+            // System.out.println("炸弹击毁敌机，得分：" + e.getScore());
         }
         for (EnemyAircraft e : enemyAircrafts) {
             e.setDestroyedByBomb(false);
@@ -718,7 +717,7 @@ public class GameController {
     // 用于增加分数（可由炸弹调用）
     public void addScore(int points) {
         this.score += points;
-        System.out.println("分数增加：" + points);
+        // System.out.println("分数增加：" + points);
     }
 
     /**

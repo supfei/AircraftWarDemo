@@ -33,10 +33,10 @@ public class PropBomb extends AbstractProp implements Subject {
 
     @Override
     public void applyEffect(HeroAircraft hero) {
-        System.out.println("💣 炸弹道具生效！");
+        // System.out.println("💣 炸弹道具生效！");
 
         if (game == null) {
-            System.out.println("警告：PropBomb 没有绑定 Game，无法直接清除敌机");
+            // System.out.println("警告：PropBomb 没有绑定 Game，无法直接清除敌机");
             notifyObservers(); // 仅通知观察者
             return;
         }
@@ -64,16 +64,16 @@ public class PropBomb extends AbstractProp implements Subject {
             if (enemy instanceof MobEnemy || enemy instanceof EliteEnemy) {
                 // 普通、精英敌机：直接清除
                 toRemoveEnemies.add(enemy);
-                System.out.println("炸弹清除了敌机: " + enemy.getClass().getSimpleName());
+                // System.out.println("炸弹清除了敌机: " + enemy.getClass().getSimpleName());
             }
             else if (enemy instanceof ElitePlusEnemy) {
                 // 超级精英：减血
                 enemy.decreaseHp(15); // 可以调整伤害值
-                System.out.println("炸弹减少了超级精英敌机血量: " + enemy.getClass().getSimpleName());
+                // System.out.println("炸弹减少了超级精英敌机血量: " + enemy.getClass().getSimpleName());
             }
             else if (enemy instanceof BossEnemy) {
                 // Boss：不受影响
-                System.out.println("Boss 敌机不受炸弹影响");
+                // System.out.println("Boss 敌机不受炸弹影响");
             }
         }
 
@@ -90,7 +90,7 @@ public class PropBomb extends AbstractProp implements Subject {
 
             if (bullet instanceof EnemyBullet) {
                 toRemoveBullets.add(bullet);
-                System.out.println("炸弹清除了敌机子弹");
+                // System.out.println("炸弹清除了敌机子弹");
             }
         }
 
@@ -101,7 +101,7 @@ public class PropBomb extends AbstractProp implements Subject {
         // -------- 3. 让英雄机获得分数 --------
         if (scoreGained > 0) {
             game.addScore(scoreGained);
-            System.out.println("🎯 英雄机通过炸弹（遍历）获得分数: " + scoreGained);
+            // System.out.println("🎯 英雄机通过炸弹（遍历）获得分数: " + scoreGained);
         }
     }
 
