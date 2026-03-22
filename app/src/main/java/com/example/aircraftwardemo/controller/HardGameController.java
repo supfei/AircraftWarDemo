@@ -14,6 +14,12 @@ public class HardGameController extends GameController {
     private int lastDifficultyUpdateTime = 0;
     private int lastEnemyAttrUpdateTime = 0;
 
+    // --- 新增：难度封顶限制 ---
+    private final int MAX_ENEMY_COUNT = 15;        // 屏幕上敌机数量上限，建议不超过20，防止碰撞检测计算过载
+    private final int MAX_ENEMY_SPEED_Y = 18;      // 敌机最大下落速度，防止穿透碰撞检测
+    private final int MAX_ENEMY_HP = 150;          // 普通敌机最大血量，防止后期打不死
+    private final float MIN_SPAWN_INTERVAL = 300f; // 最小生成间隔（毫秒）
+
     public HardGameController(boolean soundEnabled, Context context) {
         super(soundEnabled, context);
         // 简单模式初始化
@@ -53,7 +59,9 @@ public class HardGameController extends GameController {
             );
 
             // 动态增加敌机上限
-            dynamicEnemyMaxNumber += 2;
+            if (dynamicEnemyMaxNumber < MAX_ENEMY_COUNT) {
+                dynamicEnemyMaxNumber += 2;
+            }
         }
 
         // 每20秒提升敌机属性
@@ -61,11 +69,22 @@ public class HardGameController extends GameController {
             lastEnemyAttrUpdateTime = currentTime;
 
             // 提升敌机属性
-            mobConfig.setSpeedY(mobConfig.getSpeedY() + 1);
-            mobConfig.setHp(mobConfig.getHp() + 5);
-            eliteConfig.setHp(eliteConfig.getHp() + 5);
-            plusConfig.setHp(plusConfig.getHp() + 5);
-            bossConfig.setHp(bossConfig.getHp() + 50);
+//            mobConfig.setSpeedY(mobConfig.getSpeedY() + 1);
+//            mobConfig.setHp(mobConfig.getHp() + 5);
+//            eliteConfig.setHp(eliteConfig.getHp() + 5);
+//            plusConfig.setHp(plusConfig.getHp() + 5);
+//            bossConfig.setHp(bossConfig.getHp() + 50);
+            // 限制速度
+            int newSpeed = Math.min(MAX_ENEMY_SPEED_Y, mobConfig.getSpeedY() + 1);
+            mobConfig.setSpeedY(newSpeed);
+
+            // 限制血量
+            mobConfig.setHp(Math.min(MAX_ENEMY_HP, mobConfig.getHp() + 5));
+            eliteConfig.setHp(Math.min(MAX_ENEMY_HP + 50, eliteConfig.getHp() + 5));
+            plusConfig.setHp(Math.min(MAX_ENEMY_HP + 100, plusConfig.getHp() + 5));
+
+            // BOSS血量也可以酌情封顶
+            bossConfig.setHp(Math.min(2000, bossConfig.getHp() + 50));
         }
     }
 

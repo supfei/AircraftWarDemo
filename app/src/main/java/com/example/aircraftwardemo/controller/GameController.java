@@ -529,29 +529,6 @@ public class GameController {
     /** 时间相关逻辑：如难度递增、Boss生成、特效触发等，子类实现 */
     protected void onTimeIncrease() {}
 
-//    /** 渲染UI（如特殊难度 UI），子类可覆写，默认使用父类实现 */
-//    protected abstract void renderUI();
-
-    // ========== 默认实现方法（子类可直接复用或覆写） ==========
-
-//    /** 射击逻辑：敌机射击 + 英雄射击 */
-//    protected void shootAction() {
-//        // 敌机射击
-//        for (EnemyAircraft enemy : enemyAircrafts) {
-//            List<BaseBullet> bullets = enemy.shoot();
-//            if (bullets != null) {
-//                enemyBullets.addAll(bullets);
-//                for (BaseBullet bullet : bullets) {
-//                    if (bullet instanceof EnemyBullet) {
-//                        registerBulletWithBombs((EnemyBullet) bullet);
-//                    }
-//                }
-//            }
-//        }
-//        // 英雄射击
-//        heroBullets.addAll(heroAircraft.shoot());
-//    }
-
     protected void enemyShootAction() {
         // 敌机射击
         for (EnemyAircraft enemy : enemyAircrafts) {

@@ -13,6 +13,9 @@ public class NormalGameController extends GameController {
     private int dynamicEnemyMaxNumber = 6;
     private int lastDifficultyUpdateTime = 0;
 
+    // --- 新增：难度封顶限制 ---
+    private final int MAX_ENEMY_COUNT = 12;        // 屏幕上敌机数量上限，建议不超过20，防止碰撞检测计算过载
+
     public NormalGameController(boolean soundEnabled, Context context) {
         super(soundEnabled, context);
         // 简单模式初始化
@@ -48,7 +51,9 @@ public class NormalGameController extends GameController {
             heroShootScheduler.setInterval(newHeroShootInterval);
 
             // 动态增加敌机上限
-            dynamicEnemyMaxNumber += 1;
+            if (dynamicEnemyMaxNumber < MAX_ENEMY_COUNT) {
+                dynamicEnemyMaxNumber += 1;
+            }
         }
     }
 
