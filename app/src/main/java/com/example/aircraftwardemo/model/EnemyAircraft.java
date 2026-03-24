@@ -2,6 +2,7 @@ package com.example.aircraftwardemo.model;
 
 import com.example.aircraftwardemo.controller.GameConfig;
 import com.example.aircraftwardemo.observer.Observer;
+import com.example.aircraftwardemo.pool.BulletPool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,9 @@ import java.util.Random;
 
     @Override
     public BaseBullet createBullet(int x, int y, int speedX, int speedY, int power){
-        return new EnemyBullet(x, y, speedX, speedY, power);
+//        return new EnemyBullet(x, y, speedX, speedY, power);
+        // 改为从对象池获取
+        return BulletPool.getEnemyBullet(x, y, speedX, speedY, power);
     }
 
     private boolean destroyedByBomb = false;

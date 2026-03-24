@@ -17,6 +17,7 @@ import com.example.aircraftwardemo.manager.*;
 import com.example.aircraftwardemo.model.*;
 import com.example.aircraftwardemo.network.ScoreRepository;
 import com.example.aircraftwardemo.observer.Observer;
+import com.example.aircraftwardemo.pool.BulletPool;
 
 
 import java.text.SimpleDateFormat;
@@ -562,8 +563,35 @@ public class GameController {
         // 先处理被炸弹清除的敌机分数
         processDestroyedEnemies();
 
-        enemyBullets.removeIf(AbstractFlyingObject::notValid);
-        heroBullets.removeIf(AbstractFlyingObject::notValid);
+//        enemyBullets.removeIf(AbstractFlyingObject::notValid);
+//        heroBullets.removeIf(AbstractFlyingObject::notValid);
+//        使用对象池回收子弹
+        // 回收并清理英雄子弹
+        java.util.Iterator<BaseBullet> heroIter = heroBullets.iterator();
+        while (heroIter.hasNext()) {
+            BaseBullet bullet = heroIter.next();
+            if (bullet.notValid()) {
+                // 核心逻辑：在移除前放回对象池
+                if (bullet instanceof HeroBullet) {
+                    BulletPool.recycleH((HeroBullet) bullet);
+                }
+                heroIter.remove();
+            }
+        }
+
+        // 回收并清理敌机子弹
+        java.util.Iterator<BaseBullet> enemyIter = enemyBullets.iterator();
+        while (enemyIter.hasNext()) {
+            BaseBullet bullet = enemyIter.next();
+            if (bullet.notValid()) {
+                // 核心逻辑：在移除前放回对象池
+                if (bullet instanceof EnemyBullet) {
+                    BulletPool.recycleE((EnemyBullet) bullet);
+                }
+                enemyIter.remove();
+            }
+        }
+
         enemyAircrafts.removeIf(AbstractFlyingObject::notValid);
         allProps.removeIf(AbstractFlyingObject::notValid);
     }
