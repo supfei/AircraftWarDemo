@@ -6,6 +6,7 @@ import com.example.aircraftwardemo.controller.GameConfig;
 import com.example.aircraftwardemo.controller.GameController;
 import com.example.aircraftwardemo.manager.ImageManager;
 import com.example.aircraftwardemo.manager.ShootStrategyManager;
+import com.example.aircraftwardemo.pool.BulletPool;
 
 import java.util.List;
 
@@ -126,6 +127,8 @@ private static HeroAircraft instance = null;  // 改为懒汉式
 
     @Override
     public BaseBullet createBullet(int x, int y, int speedX, int speedY, int power){
-        return new HeroBullet(x, y, speedX, speedY, power);
+//        return new HeroBullet(x, y, speedX, speedY, power);
+        // 改为从对象池获取
+        return BulletPool.getHeroBullet(x, y, speedX, speedY, power);
     }
 }
