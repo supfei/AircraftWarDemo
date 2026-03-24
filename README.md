@@ -112,6 +112,7 @@ public void surfaceCreated(SurfaceHolder holder) {
 - 起作用的原因：不需要老new，内存占用稳定，不会频繁GC。
 #### 2.待实现
 - 貌似简单模式不能有boss
+- 给道具前进轨迹加散射和左右边界反弹
 - 音乐播放：还没讲
 - 排行榜的删改查（也许实现）
 - 服务器部署：还没讲
