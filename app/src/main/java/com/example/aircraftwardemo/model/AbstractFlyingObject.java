@@ -168,5 +168,15 @@ public abstract class AbstractFlyingObject {
     public void vanish() {
         isValid = false;
     }
+    public void setValid(boolean v) {
+        this.isValid = v;
+    }
+
+    public void reInit( double locationX, double locationY, int speedX, int speedY) {
+        this.setLocation(locationX, locationY);
+        this.speedX = speedX;
+        this.speedY = speedY;
+        this.setValid(true);
+    }
 
 }

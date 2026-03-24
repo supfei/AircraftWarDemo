@@ -40,4 +40,9 @@ public abstract class BaseBullet extends AbstractFlyingObject {
     public int getPower() {
         return power;
     }
+
+    public void reInit( double locationX, double locationY, int speedX, int speedY, int power) {
+        super.reInit(locationX, locationY, speedX, speedY);
+        this.power = power;
+    }
 }
