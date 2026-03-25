@@ -121,3 +121,5 @@ public void surfaceCreated(SurfaceHolder holder) {
 	- 输入房间号
 	- 在游戏界面上实时获取对方的分数并显示
 - 优化ui（也许）：全屏会挡住实机的状态栏，有点丑
+## 0325：改了多道具前进轨迹
+#### 新发现问题：PropBulletPlus里new了线程会导致线程竞争
