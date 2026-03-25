@@ -425,12 +425,17 @@ public class GameController {
 
                                 // 横向扇形偏移计算（类似子弹发射的扇形分布）
                                 int offsetIndex = i;
-                                int offset_x = (offsetIndex * 2 - totalProps + 1) * 15; // 15 是横向间距，可调整！
+                                int space_x = 16;
+                                int offset_x = (offsetIndex * 2 - totalProps + 1) * space_x; // space_x 是横向间距，可调整！
                                 int propX = enemy.getLocationX() + offset_x; // X 坐标偏移
                                 int propY = enemy.getLocationY() + 10; // Y 坐标稍微向下，更自然
+                                // 2. 计算速度偏移 (speedX) - 复用子弹散射逻辑
+                                // 让道具产生向左或向右的分离速度
+                                int propSpeedX = offset_x/4; // 这里的 '2' 是散射力度，可以根据手感调整
+                                int propSpeedY = 10; // 固定向下的速度
 
                                 // 创建道具并添加到列表
-                                AbstractProp prop = createPropByType(propTypeIndex, propX, propY);
+                                AbstractProp prop = createPropByType(propTypeIndex, propX, propY, propSpeedX, propSpeedY);
                                 if (prop != null) {
                                     allProps.add(prop);
                                 }
@@ -666,15 +671,15 @@ public class GameController {
     }
 
     /** 工具：根据类型创建道具 */
-    protected AbstractProp createPropByType(int type, int x, int y) {
+    protected AbstractProp createPropByType(int type, int x, int y, int speedX, int speedY) {
         switch (type) {
-            case 0: return new PropBloodFactory().createProp(x, y, 0, 10);
-            case 1: return new PropBulletFactory().createProp(x, y, 0, 10);
+            case 0: return new PropBloodFactory().createProp(x, y, speedX, speedY);
+            case 1: return new PropBulletFactory().createProp(x, y, speedX, speedY);
             case 2:
-                AbstractProp bomb = new PropBombFactory().createProp(x, y, 0, 10);
+                AbstractProp bomb = new PropBombFactory().createProp(x, y, speedX, speedY);
                 if (bomb instanceof PropBomb) ((PropBomb) bomb).setGame(this);
                 return bomb;
-            case 3: return new PropBulletPlusFactory().createProp(x, y, 0, 10);
+            case 3: return new PropBulletPlusFactory().createProp(x, y, speedX, speedY);
             default: return null;
         }
     }

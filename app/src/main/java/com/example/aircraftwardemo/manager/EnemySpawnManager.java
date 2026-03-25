@@ -108,6 +108,9 @@ public class EnemySpawnManager {
     public void onBossDestroyed() {
         hasBoss = false;
     }
+    public void noBoss() {
+        hasBoss = true;
+    }
 
     // ====== 敌机创建方法：调用工厂，并传入对应的 EnemyConfig ======
 
