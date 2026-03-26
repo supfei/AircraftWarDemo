@@ -12,7 +12,13 @@
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/bg_start" />
+        android:src="@drawable/bg_over" />
+
+    <!-- 👇 就是加了这一层：黑色半透明遮罩，让背景变暗 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#70000000" />
 
     <!-- 游戏结束标题 -->
     <TextView
@@ -23,8 +29,14 @@
         android:fontFamily="serif"
         android:text="游戏结束"
         android:textColor="#FF0000"
-        android:textSize="40sp"
+        android:textSize="70sp"
         android:textStyle="bold"
+
+        android:shadowColor="#000000"
+        android:shadowDx="8"
+        android:shadowDy="8"
+        android:shadowRadius="6"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,6 +53,12 @@
         android:textColor="#FFFFFF"
         android:textSize="28sp"
         android:textStyle="bold"
+
+        android:shadowColor="#000000"
+        android:shadowDx="5"
+        android:shadowDy="5"
+        android:shadowRadius="4"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_game_over" />
@@ -53,8 +71,14 @@
         android:layout_marginTop="10dp"
         android:fontFamily="serif"
         android:text="历史最高: 0"
-        android:textColor="#FFD700"
+        android:textColor="#FDD835"
         android:textSize="24sp"
+
+        android:shadowColor="#000000"
+        android:shadowDx="5"
+        android:shadowDy="5"
+        android:shadowRadius="4"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_final_score" />
@@ -86,7 +110,7 @@
         android:layout_marginBottom="30dp"
         android:fontFamily="serif"
         android:text="保存并返回"
-        android:textSize="20sp"
+        android:textSize="25sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/btn_back_menu"
         app:layout_constraintEnd_toEndOf="parent"
@@ -102,7 +126,7 @@
         android:layout_marginBottom="50dp"
         android:fontFamily="serif"
         android:text="返回主菜单"
-        android:textSize="20sp"
+        android:textSize="25sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
