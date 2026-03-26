@@ -70,10 +70,10 @@
         android:textSize="25sp"
         android:textStyle="bold"
         android:fontFamily="serif"
-        android:layout_marginBottom="20dp"
+        android:layout_marginTop="40dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/btn_normal" />
+        app:layout_constraintTop_toBottomOf="@id/radio_group" />
 
     <!-- 普通模式按钮 -->
     <Button
@@ -84,10 +84,10 @@
         android:textSize="25sp"
         android:textStyle="bold"
         android:fontFamily="serif"
-        android:layout_marginBottom="20dp"
+        android:layout_marginTop="30dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/btn_hard" />
+        app:layout_constraintTop_toBottomOf="@id/btn_easy" />
 
     <!-- 困难模式按钮 -->
     <Button
@@ -98,10 +98,10 @@
         android:textSize="25sp"
         android:textStyle="bold"
         android:fontFamily="serif"
-        android:layout_marginBottom="20dp"
+        android:layout_marginTop="30dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/btn_ranking" />
+        app:layout_constraintTop_toBottomOf="@id/btn_normal" />
 
     <!-- 添加到activity_main_menu.xml -->
     <Button
@@ -112,9 +112,9 @@
         android:textSize="25sp"
         android:textStyle="bold"
         android:fontFamily="serif"
-        android:layout_marginBottom="50dp"
+        android:layout_marginTop="30dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/btn_hard" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
