@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.Log;
 
+import com.example.aircraftwardemo.R;
 import com.example.aircraftwardemo.data.ScoreRecord;
 import com.example.aircraftwardemo.factory.*;
 import com.example.aircraftwardemo.manager.*;
@@ -401,9 +402,10 @@ public class GameController {
             if (heroAircraft.crash(bullet)) {
                 heroAircraft.decreaseHp(bullet.getPower());
                 bullet.vanish();
-                if (soundEnabled) {
-//                    getMusicManager().playBulletHit(); // 英雄被击中音效，还未开始音效相关工作
-                }
+                //敌机击中英雄机
+//                if (soundEnabled) {
+//                    AudioManager.getInstance().playSound(R.raw.bullet_hit);  // 英雄被击中音效
+//                }
             }
         }
 
@@ -420,6 +422,10 @@ public class GameController {
                     // 敌机被击中，扣血
                     enemy.decreaseHp(bullet.getPower());
                     bullet.vanish();
+
+                    if (soundEnabled) {
+                        AudioManager.getInstance().playSound(R.raw.bullet_hit);
+                    }
 
                     if (enemy.notValid()) {
                         // 敌机被击毁
@@ -452,8 +458,9 @@ public class GameController {
                         // 如果是 Boss，切换背景音乐
                         if (enemy instanceof BossEnemy) {
                             if (soundEnabled) {
-//                                getMusicManager().playBackgroundMusic(); // 切回普通背景音乐
-//                                // System.out.println("Boss 被击败，切换回普通背景音乐");
+                                // Boss 死亡，切回普通音乐并从头播放
+                                AudioManager.getInstance().stopBossBGM();  // 停止 Boss 音乐
+                                AudioManager.getInstance().restartBGM();   // 重新开始普通音乐（从头）
                             }
                             enemySpawnManager.onBossDestroyed(); // Boss 被击败，允许下次生成
                         }
@@ -478,15 +485,11 @@ public class GameController {
                 // ---- 先判断是什么道具类型 ----
                 if (soundEnabled) {
                     if (prop instanceof PropBomb) {
-                        // 如果是炸弹道具
-//                        getMusicManager().playBombExplosion(); // 播放炸弹爆炸音效
-                    } else if (prop instanceof PropBlood) {
-
-//                        getMusicManager().playGetSupply();
-
+                        // 炸弹道具：播放爆炸音效
+                        AudioManager.getInstance().playSound(R.raw.bomb_explosion);
                     } else {
-                        // 如果是火力道具
-//                        getMusicManager().playBulletShoot(); // 播放射击/火力音效
+                        // 其他道具（血包、火力等）：播放拾取音效
+                        AudioManager.getInstance().playSound(R.raw.get_supply);
                     }
                 }
 
@@ -526,6 +529,11 @@ public class GameController {
 
         // 4. 若敌机有效，则添加并注册
         if (enemy != null) {
+            // 如果是 Boss，直接切换音乐
+            if (enemy instanceof BossEnemy && soundEnabled) {
+                AudioManager.getInstance().playBossBGM();
+            }
+
             enemyAircrafts.add(enemy);
             registerEnemyWithBombs(enemy);
         }
@@ -560,6 +568,9 @@ public class GameController {
     protected void heroShootAction() {
         // 英雄射击
         heroBullets.addAll(heroAircraft.shoot());
+//        if (soundEnabled) {
+//            AudioManager.getInstance().playSound(R.raw.bullet);
+//        }太吵了
     }
     /** 移动逻辑：子弹、敌机、道具 */
     protected void moveActions() {
@@ -612,7 +623,7 @@ public class GameController {
     protected void checkGameOver() {
         if (heroAircraft.getHp() <= 0 && !gameOverFlag) {
             if (soundEnabled) {
-                // 音效相关代码
+                AudioManager.getInstance().playSound(R.raw.game_over);
             }
             // System.out.println("英雄机死亡，游戏结束！");
 

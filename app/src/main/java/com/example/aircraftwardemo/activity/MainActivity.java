@@ -7,6 +7,7 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.aircraftwardemo.manager.AudioManager;
 import com.example.aircraftwardemo.model.HeroAircraft;
 import com.example.aircraftwardemo.view.GameView;
 import java.net.Socket;
@@ -25,8 +26,11 @@ public class MainActivity extends AppCompatActivity {
         String gameMode = intent.getStringExtra("game_mode");
         // 如果没有传过来，默认为简单模式
         if (gameMode == null) {gameMode = "easy";}
-        boolean soundEnable = false;
-        intent.getBooleanExtra("music_on",soundEnable);
+
+        // 不再从 Intent 读取音乐开关，直接使用 AudioManager 的状态
+        boolean soundEnable = AudioManager.getInstance().isMusicOn();
+        // 每次进入游戏，背景音乐从头播放
+        AudioManager.getInstance().restartBGM();
 
         // 创建GameView（简单模式）
         gameView = new GameView(this, gameMode, soundEnable);
@@ -49,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         if (gameView != null) {
             gameView.pauseGame();
         }
+        // 页面暂停时关闭音乐
+        AudioManager.getInstance().pauseBGM();
     }
 
     @Override
@@ -58,6 +64,11 @@ public class MainActivity extends AppCompatActivity {
 
         if (gameView != null) {
             gameView.resumeGame();
+        }
+
+        // 根据 AudioManager 中的当前开关状态恢复音乐
+        if (AudioManager.getInstance().isMusicOn()) {
+            AudioManager.getInstance().playBGM();
         }
     }
 
