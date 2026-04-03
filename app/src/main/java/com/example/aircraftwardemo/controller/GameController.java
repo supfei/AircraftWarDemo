@@ -225,14 +225,21 @@ public class GameController {
 
     // ========== 绘制相关方法 ==========
 
+    protected int backGroundTop = 0;
+    protected int scrollSpeed = 2; // 可配置
     protected void drawBackground(Canvas canvas) {
         // 默认使用背景1，子类可以重写
         Bitmap background = ImageManager.BACKGROUND1_IMAGE;
         if (background != null) {
-            // 简单平铺背景
             int bgHeight = background.getHeight();
-            for (int y = 0; y < screenHeight; y += bgHeight) {
+            // 从 backGroundTop - bgHeight 开始绘制，确保屏幕顶部有背景
+            for (int y = backGroundTop - bgHeight; y < screenHeight; y += bgHeight) {
                 canvas.drawBitmap(background, 0, y, paint);
+            }
+            // 更新偏移量
+            backGroundTop += scrollSpeed;
+            if (backGroundTop >= bgHeight) {
+                backGroundTop -= bgHeight;
             }
         } else {
             // 没有背景图片时使用纯色

@@ -98,10 +98,15 @@ public class HardGameController extends GameController {
             background = ImageManager.BACKGROUND3_IMAGE;
         }
         if (background != null) {
-            // 简单平铺背景
             int bgHeight = background.getHeight();
-            for (int y = 0; y < screenHeight; y += bgHeight) {
+            // 向下滚动：从 backGroundTop - bgHeight 开始，确保屏幕顶部被覆盖
+            for (int y = backGroundTop - bgHeight; y < screenHeight; y += bgHeight) {
                 canvas.drawBitmap(background, 0, y, paint);
+            }
+            // 更新滚动偏移量
+            backGroundTop += scrollSpeed;
+            if (backGroundTop >= bgHeight) {
+                backGroundTop -= bgHeight;
             }
         } else {
             // 没有背景图片时使用纯色
