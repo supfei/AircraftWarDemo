@@ -1,5 +1,8 @@
 package com.example.aircraftwardemo.model;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import com.example.aircraftwardemo.manager.ShootStrategyManager;
 
 /**
@@ -7,6 +10,8 @@ import com.example.aircraftwardemo.manager.ShootStrategyManager;
  * Created on 2025/10/17 11:19
  **/
 public class PropBulletPlus extends AbstractProp{
+    private static final long EFFECT_DURATION_MS = 10_000L;
+
     public PropBulletPlus(int locationX, int locationY, int speedX, int speedY) {
         super(locationX, locationY, speedX, speedY);
     }
@@ -21,17 +26,11 @@ public class PropBulletPlus extends AbstractProp{
             strategyManager.applyCircleEffect();
 
             // 3. 10秒后恢复直射
-            new Thread(() -> {
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return;
-                }
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 hero.setShootNum(1);
                 strategyManager.applyStraightEffect();
                 // System.out.println("散射效果结束，已恢复直射。");
-            }).start();
+            }, EFFECT_DURATION_MS);
         }
 
     }

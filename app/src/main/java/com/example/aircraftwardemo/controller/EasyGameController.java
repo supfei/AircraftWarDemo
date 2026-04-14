@@ -9,6 +9,7 @@ public class EasyGameController extends GameController {
         // 简单模式初始化
         enemyMaxNumber = 5;
         BOSS_SCORE_THRESHOLD = 200;
+        enemySpawnManager.noBoss();
     }
 
     @Override
