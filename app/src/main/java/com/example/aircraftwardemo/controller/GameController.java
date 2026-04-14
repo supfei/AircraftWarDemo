@@ -1,7 +1,5 @@
 package com.example.aircraftwardemo.controller;
 
-import static java.security.AccessController.getContext;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -34,6 +32,8 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 public class GameController {
+    private static final int MAX_HERO_BULLETS = 280;
+    private static final int MAX_ENEMY_BULLETS = 420;
 //    新：context
     private Context context; //获取android的系统资源
     protected boolean soundEnabled;
@@ -410,7 +410,7 @@ public class GameController {
         }
 
         // ======================
-        // 2. 英雄子弹攻击敌机，以及碰撞、道具掉落
+        // 2. 英雄子弹攻击敌机，道具掉落
         // ======================
         for (BaseBullet bullet : heroBullets) {
             if (bullet.notValid()) continue;
@@ -467,17 +467,22 @@ public class GameController {
                     }
                 }
 
-                // 英雄与敌机相撞（互相毁灭）
-                if (enemy.crash(heroAircraft) || heroAircraft.crash(enemy)) {
-                    enemy.vanish();
-                    heroAircraft.decreaseHp(Integer.MAX_VALUE); // 致命伤害
-
-                }
             }
         }
 
         // ======================
-        // 3. 英雄拾取道具
+        // 3. 英雄与敌机相撞（互相毁灭）
+        // ======================
+        for (EnemyAircraft enemy : enemyAircrafts) {
+            if (enemy.notValid()) continue;
+            if (enemy.crash(heroAircraft) || heroAircraft.crash(enemy)) {
+                enemy.vanish();
+                heroAircraft.decreaseHp(Integer.MAX_VALUE); // 致命伤害
+            }
+        }
+
+        // ======================
+        // 4. 英雄拾取道具
         // ======================
         for (AbstractProp prop : allProps) {
             if (prop.notValid()) continue;
@@ -563,11 +568,16 @@ public class GameController {
                 }
             }
         }
+        trimBulletListToCapacity(enemyBullets, MAX_ENEMY_BULLETS);
     }
 
     protected void heroShootAction() {
         // 英雄射击
-        heroBullets.addAll(heroAircraft.shoot());
+        List<BaseBullet> bullets = heroAircraft.shoot();
+        if (bullets != null && !bullets.isEmpty()) {
+            heroBullets.addAll(bullets);
+            trimBulletListToCapacity(heroBullets, MAX_HERO_BULLETS);
+        }
 //        if (soundEnabled) {
 //            AudioManager.getInstance().playSound(R.raw.bullet);
 //        }太吵了
@@ -631,14 +641,12 @@ public class GameController {
 
             // 确保在主线程调用onGameOver
             if (gameOverListener != null) {
-                // 获取主线程Handler
-                Activity activity = (Activity) context;
-                if (activity != null) {
+                if (context instanceof Activity) {
+                    Activity activity = (Activity) context;
                     activity.runOnUiThread(() -> {
                         gameOverListener.onGameOver(getScore());
                     });
                 } else {
-                    // 如果无法获取Activity，尝试其他方式
                     new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
                         if (gameOverListener != null) {
                             gameOverListener.onGameOver(getScore());
@@ -755,6 +763,21 @@ public class GameController {
     protected void tryGenerateEnemies() {
         if (shouldGenerateEnemies()) {
             generateEnemies();
+        }
+    }
+
+    private void trimBulletListToCapacity(List<BaseBullet> bullets, int maxSize) {
+        while (bullets.size() > maxSize) {
+            BaseBullet removed = bullets.remove(0);
+            recycleBulletToPool(removed);
+        }
+    }
+
+    private void recycleBulletToPool(BaseBullet bullet) {
+        if (bullet instanceof HeroBullet) {
+            BulletPool.recycleH((HeroBullet) bullet);
+        } else if (bullet instanceof EnemyBullet) {
+            BulletPool.recycleE((EnemyBullet) bullet);
         }
     }
 

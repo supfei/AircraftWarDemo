@@ -15,7 +15,7 @@ public class ObjectPool<T> {
 
     // 将对象还回池子
     public void release(T obj) {
-        if (obj != null && !pool.contains(obj)) {
+        if (obj != null) {
             pool.addLast(obj);
         }
     }

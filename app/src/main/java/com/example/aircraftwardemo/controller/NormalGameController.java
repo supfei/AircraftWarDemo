@@ -20,7 +20,7 @@ public class NormalGameController extends GameController {
         super(soundEnabled, context);
         // 简单模式初始化
         enemyMaxNumber = 6;
-        BOSS_SCORE_THRESHOLD = 600;
+        BOSS_SCORE_THRESHOLD = 800;
 
         enemySpawnManager = new EnemySpawnManager(
                 mobConfig, eliteConfig, plusConfig, bossConfig,
@@ -85,7 +85,7 @@ public class NormalGameController extends GameController {
     }
     @Override
     protected void resetTime() {
-        this.time = 0;
+        super.resetTime();
         this.lastDifficultyUpdateTime = 0;
     }
 }

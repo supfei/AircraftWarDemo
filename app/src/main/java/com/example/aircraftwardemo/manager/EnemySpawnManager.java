@@ -33,6 +33,7 @@ public class EnemySpawnManager {
     // ========== Boss 生成条件 ==========
     private final int bossScoreThreshold; // Boss 出现的最低分数
     private boolean hasBoss = false;     // 当前是否已存在 Boss
+    private int nextBossScore;           // 下一个 Boss 触发分数阈值
 
     /**
      * 构造函数：传入所有敌机类型的配置 + 生成概率 + Boss 分数阈值
@@ -59,6 +60,7 @@ public class EnemySpawnManager {
         this.percentPlus = percentPlus;
         this.bossScoreThreshold = bossScoreThreshold;
         this.game = game;  // 保存引用
+        this.nextBossScore = Math.max(1, bossScoreThreshold);
     }
 
     /**
@@ -74,9 +76,9 @@ public class EnemySpawnManager {
         // ====== 优先级逻辑：Boss > Plus > Elite > Mob ======
 
         // 1. Boss 生成逻辑（优先判断，有分数门槛 & 唯一性）
-        if (currentScore >= bossScoreThreshold && currentScore % 200 == 0 && !hasBoss) {
-
+        if (!hasBoss && currentScore >= nextBossScore) {
             hasBoss = true;
+            nextBossScore += Math.max(1, bossScoreThreshold);
 //            // 如果游戏开启了声音，播放 Boss 背景音乐
 //            if (game != null && game.soundEnabled) {
 //                game.getMusicManager().playBossBackgroundMusic();

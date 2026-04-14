@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AudioManager {
+    private static final float MAX_VOLUME = 1.0f;
     private static AudioManager instance;
 
     // 背景音乐（普通）
@@ -60,7 +61,7 @@ public class AudioManager {
         bossBgmPlayer = MediaPlayer.create(context, R.raw.bgm_boss);
         if (bossBgmPlayer != null) {
             bossBgmPlayer.setLooping(true);
-            bossBgmPlayer.setVolume(1.1f, 1.1f);
+            bossBgmPlayer.setVolume(MAX_VOLUME, MAX_VOLUME);
         }
     }
 
@@ -152,7 +153,7 @@ public class AudioManager {
     public void playSound(int soundId) {
         if (isSoundOn && soundPool != null && soundMap.containsKey(soundId)) {
             // 参数：leftVolume, rightVolume, priority, loop, rate
-            soundPool.play(soundMap.get(soundId), 1.5f, 1.5f, 1, 0, 1.0f);
+            soundPool.play(soundMap.get(soundId), MAX_VOLUME, MAX_VOLUME, 1, 0, 1.0f);
         }
     }
 

@@ -156,13 +156,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     // 实现GameController.GameOverListener接口的方法
     @Override
     public void onGameOver(int finalScore) {
-        // 在主线程中显示游戏结束UI
-        Activity activity = (Activity) getContext();
-        if (activity != null) {
-            activity.runOnUiThread(() -> {
-                showGameOverDialog(finalScore);
-            });
-        }
+        runOnUiThreadSafely(() -> showGameOverDialog(finalScore));
     }
 
     // 显示游戏结束对话框
@@ -174,7 +168,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 
         isGameOverShown = true;
 
-        Activity activity = (Activity) getContext();
+        Activity activity = getActivityFromContext();
         if (activity == null) {
             Log.e("GameView", "Activity is null, cannot show game over dialog");
             isGameOverShown = false;
@@ -241,16 +235,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 
     // 返回主菜单
     private void returnToMainMenu() {
-        // 停止游戏线程
-        isRunning = false;
-
-        if (gameThread != null) {
-            try {
-                gameThread.join(500);  // 等待线程结束
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        requestStopGameThread();
 
         // 清理游戏资源
         if (gameController != null) {
@@ -258,7 +243,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         }
 
         // 结束当前Activity，返回主菜单
-        Activity activity = (Activity) getContext();
+        Activity activity = getActivityFromContext();
         if (activity != null) {
             activity.finish();
         }
@@ -284,17 +269,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     public void surfaceDestroyed(SurfaceHolder holder) {
         Log.d("GameView", "Surface销毁");
 
-        // 停止游戏线程
-        isRunning = false;
-
-        // 等待线程结束
-        if (gameThread != null) {
-            try {
-                gameThread.join(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        requestStopGameThread();
 
         // 清理资源
         cleanupGameController();
@@ -497,15 +472,15 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     private void stopGameThread() {
         Log.d("GameView", "停止游戏线程...");
 
-        isRunning = false;
-
-        if (gameThread != null) {
+        requestStopGameThread();
+        Thread threadToWait = gameThread;
+        if (threadToWait != null) {
             try {
                 // 等待线程结束
-                gameThread.join(1000); // 最多等待1秒
-                if (gameThread.isAlive()) {
+                threadToWait.join(1000); // 最多等待1秒
+                if (threadToWait.isAlive()) {
                     Log.w("GameView", "游戏线程仍在运行，尝试中断");
-                    gameThread.interrupt();
+                    threadToWait.interrupt();
                 }
             } catch (InterruptedException e) {
                 Log.e("GameView", "等待游戏线程结束时中断", e);
@@ -600,6 +575,31 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     public void pauseGame() {
         Log.d("GameView", "暂停游戏");
         isRunning = false;
+    }
+
+    private void requestStopGameThread() {
+        isRunning = false;
+        Thread thread = gameThread;
+        if (thread != null && thread.isAlive()) {
+            thread.interrupt();
+        }
+    }
+
+    private Activity getActivityFromContext() {
+        Context context = getContext();
+        if (context instanceof Activity) {
+            return (Activity) context;
+        }
+        return null;
+    }
+
+    private void runOnUiThreadSafely(Runnable action) {
+        Activity activity = getActivityFromContext();
+        if (activity != null) {
+            activity.runOnUiThread(action);
+        } else {
+            post(action);
+        }
     }
 
 
