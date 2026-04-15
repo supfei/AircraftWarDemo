@@ -3,6 +3,7 @@ package com.example.aircraftwardemo.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,10 +17,18 @@ import java.util.List;
 public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.ViewHolder> {
 
     private List<ScoreRecord> scoreList;
+    private OnItemDeleteListener deleteListener;
 
     public void setData(List<ScoreRecord> scoreList) {
         this.scoreList = scoreList;
         notifyDataSetChanged();
+    }
+
+    public interface OnItemDeleteListener {
+        void onDelete(int position, ScoreRecord record);
+    }
+    public void setOnItemDeleteListener(OnItemDeleteListener listener) {
+        this.deleteListener = listener;
     }
 
     @NonNull
@@ -41,6 +50,13 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.ViewHold
         holder.tvName.setText(record.getName());
         holder.tvScore.setText(String.valueOf(record.getScore()));
         holder.tvDate.setText(record.getDate());
+
+        // 删除按钮点击事件
+        holder.btnDelete.setOnClickListener(v -> {
+            if (deleteListener != null) {
+                deleteListener.onDelete(position, record);
+            }
+        });
     }
 
     @Override
@@ -50,6 +66,7 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.ViewHold
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvRank, tvName, tvScore, tvDate;
+        ImageButton btnDelete;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -57,6 +74,7 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.ViewHold
             tvName = itemView.findViewById(R.id.tv_name);
             tvScore = itemView.findViewById(R.id.tv_score);
             tvDate = itemView.findViewById(R.id.tv_date);
+            btnDelete = itemView.findViewById(R.id.btn_delete);
         }
     }
 }

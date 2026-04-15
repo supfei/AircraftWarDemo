@@ -8,6 +8,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.app.AlertDialog;
 
 import com.example.aircraftwardemo.R;
 import com.example.aircraftwardemo.adapter.RankingAdapter;
@@ -44,6 +45,8 @@ public class GlobalRankingActivity extends AppCompatActivity {
 
         // 加载排行榜数据
         loadGlobalRanking();
+
+        adapter.setOnItemDeleteListener(this::onDeleteItem);
     }
 
     private void loadGlobalRanking() {
@@ -105,5 +108,30 @@ public class GlobalRankingActivity extends AppCompatActivity {
 
     public void onBackClick(View view) {
         finish();
+    }
+
+    private void onDeleteItem(int position, ScoreRecord record) {
+        new AlertDialog.Builder(this)
+                .setTitle("确定要删除“" + record.getName() + "”的分数记录吗？")
+                //.setMessage("确定要删除 " + record.getName() + " 的分数记录吗？")
+                .setPositiveButton("是", (dialog, which) -> {
+                    // 1. 从本地数据库删除
+                    repository.deleteScore(record);
+
+                    // 2. 刷新界面
+                    List<ScoreRecord> newList = repository.getLocalScores();
+                    adapter.setData(newList);
+
+                    // 3. 空视图处理
+                    if (newList.isEmpty()) {
+                        showEmptyView("暂无排行榜数据");
+                    } else {
+                        tvEmpty.setVisibility(View.GONE);
+                    }
+
+                    Toast.makeText(this, "已删除", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("否", null)  // 点击“否”什么都不做，对话框关闭
+                .show();
     }
 }
