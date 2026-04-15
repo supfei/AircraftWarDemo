@@ -1,11 +1,18 @@
 package com.example.aircraftwardemo.data;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 import android.content.Context;
-import android.os.Environment;
+import android.content.SharedPreferences;
 import android.util.Log;
+import androidx.room.Room;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author 有朝宿云
@@ -13,67 +20,112 @@ import android.util.Log;
  **/
 public class ScoreDaoImpl implements ScoreDao {
 
-    private List<ScoreRecord> scores;
-    private Context context;
-    private  String FILE_NAME = "scores.csv";
+    private static final String TAG = "ScoreDaoImpl";
+    private static final String FILE_NAME = "scores.csv";
+    private static final String DB_NAME = "scores.db";
+    private static final String PREF_NAME = "score_storage_migration";
+    private static final String KEY_CSV_MIGRATED = "scores_csv_migrated";
+    private final Context context;
+    private final RoomScoreDao roomScoreDao;
+    private final ExecutorService dbExecutor;
+    private final Object cacheLock = new Object();
+    private final List<ScoreRecord> cache = new ArrayList<>();
 
-    // 修改构造函数，接收Context参数
     public ScoreDaoImpl(Context context) {
-        this.context = context.getApplicationContext();  // 使用Application Context避免内存泄漏
-        scores = loadScoresFromCSV();
+        this.context = context.getApplicationContext();
+        AppDatabase database = Room.databaseBuilder(this.context, AppDatabase.class, DB_NAME)
+                .build();
+        this.roomScoreDao = database.roomScoreDao();
+        this.dbExecutor = Executors.newSingleThreadExecutor();
+        dbExecutor.execute(() -> {
+            migrateCsvToRoomIfNeeded();
+            refreshCacheFromDb();
+        });
     }
 
-    // 确保使用context.getFilesDir()获取内部存储路径
-    private String getFilePath() {
-        if (context == null) {
-            Log.e("ScoreDaoImpl", "Context is null!");
-            return "scores.csv";  // 返回默认文件名
-
-            // 回退方案：使用外部存储
-//            File externalDir = Environment.getExternalStorageDirectory();
-//            File file = new File(externalDir, "AircraftWar/scores.csv");
-//            return file.getAbsolutePath();
-        }
-        File dir = context.getFilesDir();
-        File file = new File(dir, FILE_NAME);
-        Log.d("ScoreDaoImpl", "File path: " + file.getAbsolutePath());
-        return file.getAbsolutePath();
-    }
     @Override
     public void addScore(ScoreRecord scoreRecord) {
-        scores.add(scoreRecord);
-        saveScoresToCSV();
+        synchronized (cacheLock) {
+            cache.add(scoreRecord);
+            sortCacheInPlace();
+        }
+        dbExecutor.execute(() -> roomScoreDao.insert(toEntity(scoreRecord)));
     }
 
     @Override
     public List<ScoreRecord> getAllScores() {
-        // 按分数降序排序（可选，用于排行榜）
-        scores.sort((a, b) -> Integer.compare(b.getScore(), a.getScore()));
-        return scores;
+        synchronized (cacheLock) {
+            return new ArrayList<>(cache);
+        }
     }
+
     @Override
     public void deleteScore(String name, int score, String date) {
-        // 直接从内存中的 scores 列表中删除匹配的记录
-        scores.removeIf(record ->
-                record.getName().equals(name) &&
-                        record.getScore() == score &&
-                        record.getDate().equals(date)
-        );
-
-        // 将更新后的列表重新保存到 CSV 文件
-        saveScoresToCSV();
+        synchronized (cacheLock) {
+            cache.removeIf(record ->
+                    record.getName().equals(name)
+                            && record.getScore() == score
+                            && record.getDate().equals(date)
+            );
+        }
+        dbExecutor.execute(() -> roomScoreDao.deleteByFields(name, score, date));
     }
 
-    // ==================== CSV 文件读取 ====================
+    private void migrateCsvToRoomIfNeeded() {
+        SharedPreferences preferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        if (preferences.getBoolean(KEY_CSV_MIGRATED, false)) {
+            return;
+        }
+
+        try {
+            int rowCount = roomScoreDao.count();
+            if (rowCount > 0) {
+                markMigrationDone(preferences);
+                return;
+            }
+
+            List<ScoreRecord> csvRecords = loadScoresFromCSV();
+            if (csvRecords.isEmpty()) {
+                markMigrationDone(preferences);
+                return;
+            }
+
+            List<ScoreEntity> entities = new ArrayList<>(csvRecords.size());
+            for (ScoreRecord record : csvRecords) {
+                entities.add(toEntity(record));
+            }
+            roomScoreDao.insertAll(entities);
+            Log.d(TAG, "CSV migration success, count=" + entities.size());
+            markMigrationDone(preferences);
+        } catch (Exception e) {
+            Log.e(TAG, "CSV migration failed", e);
+        }
+    }
+
+    private void refreshCacheFromDb() {
+        List<ScoreEntity> entities = roomScoreDao.getAllOrderByScoreDesc();
+        List<ScoreRecord> latest = new ArrayList<>(entities.size());
+        for (ScoreEntity entity : entities) {
+            latest.add(toRecord(entity));
+        }
+        synchronized (cacheLock) {
+            cache.clear();
+            cache.addAll(latest);
+        }
+    }
+
+    private void sortCacheInPlace() {
+        cache.sort((a, b) -> Integer.compare(b.getScore(), a.getScore()));
+    }
+
+    private void markMigrationDone(SharedPreferences preferences) {
+        preferences.edit().putBoolean(KEY_CSV_MIGRATED, true).apply();
+    }
+
     private List<ScoreRecord> loadScoresFromCSV() {
         List<ScoreRecord> loadedScores = new ArrayList<>();
-        if (context == null) {
-            Log.e("ScoreDaoImpl", "Context is null in loadScoresFromCSV");
-            return loadedScores;
-        }
-        File file = new File(getFilePath());  // 使用getFilePath()
+        File file = getCsvFile();
 
-        // 如果文件不存在或为空，返回空列表
         if (!file.exists() || file.length() == 0) {
             return loadedScores;
         }
@@ -81,15 +133,11 @@ public class ScoreDaoImpl implements ScoreDao {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             boolean isFirstLine = true;
-
             while ((line = reader.readLine()) != null) {
-                // 跳过表头
                 if (isFirstLine) {
                     isFirstLine = false;
                     continue;
                 }
-
-                // 按逗号分割
                 String[] parts = line.split(",");
                 if (parts.length >= 3) {
                     String name = parts[0].trim();
@@ -98,47 +146,25 @@ public class ScoreDaoImpl implements ScoreDao {
                         String date = parts[2].trim();
                         loadedScores.add(new ScoreRecord(name, score, date));
                     } catch (NumberFormatException e) {
-                        System.err.println("无法解析分数: " + line);
+                        Log.w(TAG, "Skip bad score row: " + line);
                     }
                 }
             }
         } catch (IOException e) {
-            System.err.println("读取 CSV 文件失败: " + e.getMessage());
-            e.printStackTrace();
+            Log.e(TAG, "Read CSV failed", e);
         }
-
         return loadedScores;
     }
 
-    // ==================== CSV 文件写入 ====================
-    private void saveScoresToCSV() {
-        if (context == null) {
-            Log.e("ScoreDaoImpl", "Context is null in saveScoresToCSV");
-            return;
-        }
-        File file = new File(getFilePath());  // 使用getFilePath()
+    private File getCsvFile() {
+        return new File(context.getFilesDir(), FILE_NAME);
+    }
 
-        // 确保 data 目录存在
-        File dir = file.getParentFile();
-        if (dir != null && !dir.exists()) {
-            dir.mkdirs(); // 创建 data 目录
-        }
+    private ScoreEntity toEntity(ScoreRecord record) {
+        return new ScoreEntity(record.getName(), record.getScore(), record.getDate());
+    }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            // 写入表头
-            writer.write("name,score,date");
-            writer.newLine();
-
-            // 写入每一条记录
-            for (ScoreRecord record : scores) {
-                writer.write(record.getName() + "," +
-                        record.getScore() + "," +
-                        record.getDate());
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            System.err.println("保存 CSV 文件失败: " + e.getMessage());
-            e.printStackTrace();
-        }
+    private ScoreRecord toRecord(ScoreEntity entity) {
+        return new ScoreRecord(entity.name, entity.score, entity.date);
     }
 }
