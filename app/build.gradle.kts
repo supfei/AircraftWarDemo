@@ -50,5 +50,7 @@ dependencies {
     implementation(libs.moshi)  // 可选，如果你用Moshi而不是Gson
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    implementation(libs.room.runtime)
+    annotationProcessor(libs.room.compiler)
 
 }
