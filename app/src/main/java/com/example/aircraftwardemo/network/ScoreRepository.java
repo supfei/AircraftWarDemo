@@ -79,6 +79,13 @@ public class ScoreRepository {
     }
 
     /**
+     * 删除云端分数记录
+     */
+    public void deleteRemoteScore(ScoreRecord scoreRecord, ScoreNetworkManager.ScoreDeleteCallback callback) {
+        networkManager.deleteRemoteScore(scoreRecord, callback);
+    }
+
+    /**
      * 测试网络连接
      */
     public void testNetworkConnection(ScoreNetworkManager.ConnectionTestCallback callback) {

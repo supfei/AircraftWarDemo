@@ -27,7 +27,7 @@ public class ScoreNetworkManager {
     private static final String TAG = "ScoreNetworkManager";
 
     // 服务器根地址，接口路径由 ScoreApiService 维护。
-    private static final String BASE_URL = "https://your-server.com/";
+    private static final String BASE_URL = "http://47.121.193.199:8080/";
 
     // 提供全局 JSON 序列化能力。
     private final Gson gson;
@@ -126,6 +126,36 @@ public class ScoreNetworkManager {
         });
     }
 
+    /**
+     * 删除云端分数记录
+     */
+    // 通过姓名+分数+时间删除云端记录。
+    public void deleteRemoteScore(ScoreRecord scoreRecord, ScoreDeleteCallback callback) {
+        NetworkScoreRecord networkScoreRecord = new NetworkScoreRecord(scoreRecord);
+        scoreApiService.deleteScore(networkScoreRecord).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "云端删除成功: " + scoreRecord.getName() + ", " + scoreRecord.getScore());
+                    callback.onSuccess();
+                } else if (response.code() == 404) {
+                    Log.w(TAG, "云端记录不存在，视为已删除: " + scoreRecord.getName());
+                    callback.onSuccess();
+                } else {
+                    Log.e(TAG, "云端删除失败: " + response.code());
+                    callback.onFailure("服务器错误: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                String error = t.getMessage() == null ? "未知网络错误" : t.getMessage();
+                Log.e(TAG, "云端删除异常: " + error);
+                callback.onFailure("网络错误: " + error);
+            }
+        });
+    }
+
     // 上传结果回调接口。
     public interface ScoreUploadCallback {
         void onSuccess();
@@ -141,6 +171,12 @@ public class ScoreNetworkManager {
     // 连接测试回调接口。
     public interface ConnectionTestCallback {
         void onTestResult(boolean isConnected);
+    }
+
+    // 删除结果回调接口。
+    public interface ScoreDeleteCallback {
+        void onSuccess();
+        void onFailure(String error);
     }
 
     // 将网络模型列表转换为本地展示模型列表。
