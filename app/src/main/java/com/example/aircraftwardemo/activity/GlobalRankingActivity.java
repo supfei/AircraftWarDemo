@@ -115,21 +115,30 @@ public class GlobalRankingActivity extends AppCompatActivity {
                 .setTitle("确定要删除“" + record.getName() + "”的分数记录吗？")
                 //.setMessage("确定要删除 " + record.getName() + " 的分数记录吗？")
                 .setPositiveButton("是", (dialog, which) -> {
-                    // 1. 从本地数据库删除
-                    repository.deleteScore(record);
+                    // 1. 先删除云端，确保服务器和本地保持一致
+                    repository.deleteRemoteScore(record, new ScoreNetworkManager.ScoreDeleteCallback() {
+                        @Override
+                        public void onSuccess() {
+                            runOnUiThread(() -> {
+                                // 2. 云端成功后再删除本地
+                                repository.deleteScore(record);
 
-                    // 2. 刷新界面
-                    List<ScoreRecord> newList = repository.getLocalScores();
-                    adapter.setData(newList);
+                                // 3. 重新拉取云端榜单，确保展示与服务器一致
+                                loadGlobalRanking();
 
-                    // 3. 空视图处理
-                    if (newList.isEmpty()) {
-                        showEmptyView("暂无排行榜数据");
-                    } else {
-                        tvEmpty.setVisibility(View.GONE);
-                    }
+                                Toast.makeText(GlobalRankingActivity.this, "已删除", Toast.LENGTH_SHORT).show();
+                            });
+                        }
 
-                    Toast.makeText(this, "已删除", Toast.LENGTH_SHORT).show();
+                        @Override
+                        public void onFailure(String error) {
+                            runOnUiThread(() -> Toast.makeText(
+                                    GlobalRankingActivity.this,
+                                    "删除失败: " + error,
+                                    Toast.LENGTH_SHORT
+                            ).show());
+                        }
+                    });
                 })
                 .setNegativeButton("否", null)  // 点击“否”什么都不做，对话框关闭
                 .show();
