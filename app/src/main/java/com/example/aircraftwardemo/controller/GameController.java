@@ -180,6 +180,8 @@ public class GameController {
 
         // 3. 绘制英雄机
         drawHeroAircraft(canvas);
+        // 绘制 Boss 血条
+        drawBossHealthBar(canvas);
 
         // 4. 绘制UI（分数、生命值）
         drawUI(canvas);
@@ -270,6 +272,57 @@ public class GameController {
             int y = heroAircraft.getLocationY() - heroImage.getHeight() / 2;
             canvas.drawBitmap(heroImage, x, y, paint);
         }
+    }
+
+    private void drawBossHealthBar(Canvas canvas) {
+        BossEnemy boss = null;
+        for (EnemyAircraft enemy : enemyAircrafts) {
+            if (enemy instanceof BossEnemy && !enemy.notValid()) {
+                boss = (BossEnemy) enemy;
+                break;
+            }
+        }
+        if (boss == null) return;
+
+        int barWidth = 300;
+        int barHeight = 20;
+        int x = boss.getLocationX() - barWidth / 2;
+        int y = boss.getLocationY() - 50;
+
+        // 边界裁剪
+        if (x < 0) x = 10;
+        if (x + barWidth > screenWidth) x = screenWidth - barWidth - 10;
+
+        // 背景
+        paint.setColor(Color.GRAY);
+        canvas.drawRect(x, y, x + barWidth, y + barHeight, paint);
+
+        // 当前血量（使用 getMaxHp() 和 getHp()）
+        int currentWidth = (int) ((double) boss.getHp() / boss.getMaxHp() * barWidth);
+        if (currentWidth > barWidth * 0.6) {
+            paint.setColor(Color.GREEN);
+        } else if (currentWidth > barWidth * 0.3) {
+            paint.setColor(Color.YELLOW);
+        } else {
+            paint.setColor(Color.RED);
+        }
+        canvas.drawRect(x, y, x + currentWidth, y + barHeight, paint);
+
+        // 边框
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(3);
+        paint.setColor(Color.BLACK);
+        canvas.drawRect(x, y, x + barWidth, y + barHeight, paint);
+        paint.setStyle(Paint.Style.FILL);
+
+        // 文字
+        paint.setColor(Color.WHITE);
+        paint.setTextSize(30);
+        String hpText = boss.getHp() + "/" + boss.getMaxHp();
+        float textWidth = paint.measureText(hpText);
+        float textX = x + (barWidth - textWidth) / 2;
+        float textY = y + barHeight - 6;
+        canvas.drawText(hpText, textX, textY, paint);
     }
 
     protected void drawUI(Canvas canvas) {
