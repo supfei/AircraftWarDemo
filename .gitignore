@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# 本地环境变量（含公网 IP 等），勿提交
+.env

@@ -3,6 +3,7 @@ package com.example.aircraftwardemo.network;
 import android.content.Context;
 import android.util.Log;
 
+import com.example.aircraftwardemo.BuildConfig;
 import com.example.aircraftwardemo.data.ScoreRecord;
 import com.google.gson.Gson;
 
@@ -26,8 +27,8 @@ public class ScoreNetworkManager {
     // 用于日志定位网络流程。
     private static final String TAG = "ScoreNetworkManager";
 
-    // 服务器根地址，接口路径由 ScoreApiService 维护。
-    private static final String BASE_URL = "http://47.121.193.199:8080/";
+    // 服务器根地址由项目根目录 .env 构建时注入 BuildConfig。
+    private static final String BASE_URL = BuildConfig.SCORE_API_BASE_URL;
 
     // 提供全局 JSON 序列化能力。
     private final Gson gson;
