@@ -330,18 +330,19 @@ public class GameController {
     protected void drawUI(Canvas canvas) {
         // 绘制分数（轻联机时追加对手分数）
         paint.setColor(Color.RED);
-        paint.setTextSize(40);
+        paint.setShadowLayer(10, 0, 0, Color.BLACK); // 增加阴影，提升高级感
+        paint.setTextSize(50);
         paint.setTypeface(Typeface.DEFAULT_BOLD);
         String scoreLine = "SCORE: " + score;
         if (multiplayerEnabled) {
             String enemyScoreText = enemyScore >= 0 ? String.valueOf(enemyScore) : "--";
             scoreLine = scoreLine + "    ENEMY SCORE: " + enemyScoreText;
         }
-        canvas.drawText(scoreLine, 20, 50, paint);
+        canvas.drawText(scoreLine, 30, 100, paint);
 
         // 绘制生命值
         if (heroAircraft != null) {
-            canvas.drawText("LIFE: " + heroAircraft.getHp(), 20, 100, paint);
+            canvas.drawText("LIFE: " + heroAircraft.getHp(), 30, 150, paint);
         }
 
         // 游戏结束时显示Game Over
