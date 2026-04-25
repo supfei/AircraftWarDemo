@@ -16,7 +16,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
     private RadioGroup radioGroup;
     private RadioButton radioOn, radioOff;
-    private Button btnEasy, btnNormal, btnHard;
+    private Button btnSingle, btnOnline;
     private boolean isMusicOn = true; // 默认音乐开启
 
     @Override
@@ -48,9 +48,8 @@ public class MainMenuActivity extends AppCompatActivity {
         radioGroup = findViewById(R.id.radio_group);
         radioOn = findViewById(R.id.radio_on);
         radioOff = findViewById(R.id.radio_off);
-        btnEasy = findViewById(R.id.btn_easy);
-        btnNormal = findViewById(R.id.btn_normal);
-        btnHard = findViewById(R.id.btn_hard);
+        btnSingle = findViewById(R.id.btn_single);
+        btnOnline = findViewById(R.id.btn_online);
         radioOn.setChecked(true);
     }
 
@@ -71,27 +70,19 @@ public class MainMenuActivity extends AppCompatActivity {
             }
         });
 
-        // 简单模式按钮
-        btnEasy.setOnClickListener(new View.OnClickListener() {
+        // 单机模式按钮
+        btnSingle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startGame("easy");
+                startDifficultySelect(false);
             }
         });
 
-        // 普通模式按钮
-        btnNormal.setOnClickListener(new View.OnClickListener() {
+        // 联机模式按钮
+        btnOnline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startGame("normal");
-            }
-        });
-
-        // 困难模式按钮
-        btnHard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startGame("hard");
+                startDifficultySelect(true);
             }
         });
 
@@ -104,18 +95,17 @@ public class MainMenuActivity extends AppCompatActivity {
         });
 
     }
+    private void startDifficultySelect(boolean fromOnlineMode) {
+        Intent intent = new Intent(MainMenuActivity.this, DifficultySelectActivity.class);
+        intent.putExtra("from_online_mode", fromOnlineMode);
+        startActivity(intent);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
     // 添加方法
     private void startRankingActivity() {
         Intent intent = new Intent(MainMenuActivity.this, GlobalRankingActivity.class);
         startActivity(intent);
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-    }
-    private void startGame(String mode) {
-        Intent intent = new Intent(MainMenuActivity.this, MainActivity.class);
-        intent.putExtra("game_mode", mode);
-        intent.putExtra("music_on", isMusicOn);
-        startActivity(intent);
-        // 添加切换动画
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 }
