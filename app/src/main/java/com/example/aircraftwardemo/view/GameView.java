@@ -2,40 +2,28 @@
 package com.example.aircraftwardemo.view;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.example.aircraftwardemo.R;
+import com.example.aircraftwardemo.activity.GameOverActivity;
 import com.example.aircraftwardemo.controller.GameConfig;
 import com.example.aircraftwardemo.controller.EasyGameController;
 import com.example.aircraftwardemo.controller.GameController;
 import com.example.aircraftwardemo.controller.HardGameController;
 import com.example.aircraftwardemo.controller.NormalGameController;
-import com.example.aircraftwardemo.data.ScoreRecord;
 import com.example.aircraftwardemo.factory.GameControllerFactory;
 import com.example.aircraftwardemo.manager.ImageManager;
 import com.example.aircraftwardemo.model.HeroAircraft;
-import com.example.aircraftwardemo.network.ScoreRepository;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * 游戏视图，继承SurfaceView
@@ -158,97 +146,31 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     // 实现GameController.GameOverListener接口的方法
     @Override
     public void onGameOver(int finalScore) {
-        runOnUiThreadSafely(() -> showGameOverDialog(finalScore));
+        runOnUiThreadSafely(() -> openGameOverPage(finalScore));
     }
 
-    // 显示游戏结束对话框
-    private void showGameOverDialog(int finalScore) {
+    // 跳转到独立游戏结束页
+    private void openGameOverPage(int finalScore) {
         if (isGameOverShown || getContext() == null) {
-            Log.e("GameView", "Context is null, cannot show game over dialog");
             return;
         }
-
         isGameOverShown = true;
-
         Activity activity = getActivityFromContext();
         if (activity == null) {
-            Log.e("GameView", "Activity is null, cannot show game over dialog");
             isGameOverShown = false;
             return;
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        LayoutInflater inflater = LayoutInflater.from(activity);
-        View dialogView = inflater.inflate(R.layout.game_over_dialog, null);
-        builder.setView(dialogView);
-        builder.setCancelable(false);
-
-        // 初始化视图组件
-        TextView tvFinalScore = dialogView.findViewById(R.id.tv_final_score);
-        TextView tvHighScore = dialogView.findViewById(R.id.tv_high_score);
-        EditText etPlayerName = dialogView.findViewById(R.id.et_player_name);
-        Button btnSaveRestart = dialogView.findViewById(R.id.btn_save_restart);
-        Button btnBackMenu = dialogView.findViewById(R.id.btn_back_menu);
-
-        // 设置分数
-        tvFinalScore.setText("最终得分: " + finalScore);
-
-        // 获取并显示历史最高分
-        ScoreRepository repository = ScoreRepository.getInstance(getContext());
-        List<ScoreRecord> scores = repository.getLocalScores();
-        int highScore = scores.isEmpty() ? 0 : scores.get(0).getScore();
-        tvHighScore.setText("历史最高: " + highScore);
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-        // 设置窗口背景透明
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
-
-        // 按钮事件监听
-        btnSaveRestart.setOnClickListener(v -> {
-            String playerName = etPlayerName.getText().toString().trim();
-            if (playerName.isEmpty()) {
-                playerName = "匿名玩家";
-            }
-
-            // 保存分数
-            String currentTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                    .format(new Date());
-            ScoreRecord scoreRecord = new ScoreRecord(playerName, finalScore, currentTime);
-            repository.addScore(scoreRecord);
-
-            // 重新开始游戏
-            dialog.dismiss();
-            returnToMainMenu();
-        });
-
-        btnBackMenu.setOnClickListener(v -> {
-            dialog.dismiss();
-            returnToMainMenu();
-        });
-
-        // 对话框关闭时重置标志
-        dialog.setOnDismissListener(dialog1 -> {
-            isGameOverShown = false;
-        });
-    }
-
-    // 返回主菜单
-    private void returnToMainMenu() {
         requestStopGameThread();
-
-        // 清理游戏资源
         if (gameController != null) {
             gameController.cleanup();
         }
-
-        // 结束当前Activity，返回主菜单
-        Activity activity = getActivityFromContext();
-        if (activity != null) {
-            activity.finish();
-        }
+        Intent intent = new Intent(activity, GameOverActivity.class);
+        intent.putExtra(GameOverActivity.EXTRA_FINAL_SCORE, finalScore);
+        intent.putExtra(GameOverActivity.EXTRA_GAME_MODE, difficulty);
+        intent.putExtra(GameOverActivity.EXTRA_IS_MULTIPLAYER, multiplayerEnabled);
+        activity.startActivity(intent);
+        activity.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        activity.finish();
     }
 
 
