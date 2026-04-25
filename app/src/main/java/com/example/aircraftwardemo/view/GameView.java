@@ -68,6 +68,8 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     private GameController gameController;
     private String difficulty = "hard";
     private boolean soundEnabled = false;
+    private boolean multiplayerEnabled = false;
+    private int enemyScore = -1;
 
     // 屏幕尺寸
     private int screenWidth;
@@ -417,6 +419,8 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         if (gameController != null) {
             gameController.setGameOverListener(this);
             HeroAircraft.getInstance().setGame(gameController);
+            gameController.setMultiplayerEnabled(multiplayerEnabled);
+            gameController.setEnemyScore(enemyScore);
         }
 
         // 设置屏幕尺寸
@@ -435,6 +439,27 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 
     public GameController getGameController() {
         return gameController;
+    }
+
+    public void setMultiplayerEnabled(boolean multiplayerEnabled) {
+        this.multiplayerEnabled = multiplayerEnabled;
+        if (gameController != null) {
+            gameController.setMultiplayerEnabled(multiplayerEnabled);
+        }
+    }
+
+    public void setEnemyScore(int enemyScore) {
+        this.enemyScore = enemyScore;
+        if (gameController != null) {
+            gameController.setEnemyScore(enemyScore);
+        }
+    }
+
+    public int getCurrentScore() {
+        if (gameController == null) {
+            return 0;
+        }
+        return gameController.getScore();
     }
 
     /**

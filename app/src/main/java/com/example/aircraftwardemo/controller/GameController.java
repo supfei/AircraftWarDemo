@@ -57,6 +57,8 @@ public class GameController {
 
     // ========== 游戏状态 ==========
     protected int score = 0;
+    protected int enemyScore = -1;
+    protected boolean multiplayerEnabled = false;
     protected int time = 0;
     protected int timeInterval = 40; // 刷新间隔（毫秒）
     protected boolean gameOverFlag = false;
@@ -326,11 +328,16 @@ public class GameController {
     }
 
     protected void drawUI(Canvas canvas) {
-        // 绘制分数
+        // 绘制分数（轻联机时追加对手分数）
         paint.setColor(Color.RED);
         paint.setTextSize(40);
         paint.setTypeface(Typeface.DEFAULT_BOLD);
-        canvas.drawText("SCORE: " + score, 20, 50, paint);
+        String scoreLine = "SCORE: " + score;
+        if (multiplayerEnabled) {
+            String enemyScoreText = enemyScore >= 0 ? String.valueOf(enemyScore) : "--";
+            scoreLine = scoreLine + "    ENEMY SCORE: " + enemyScoreText;
+        }
+        canvas.drawText(scoreLine, 20, 50, paint);
 
         // 绘制生命值
         if (heroAircraft != null) {
@@ -384,6 +391,18 @@ public class GameController {
 
     public int getScore() {
         return score;
+    }
+
+    public void setEnemyScore(int enemyScore) {
+        this.enemyScore = enemyScore;
+    }
+
+    public int getEnemyScore() {
+        return enemyScore;
+    }
+
+    public void setMultiplayerEnabled(boolean multiplayerEnabled) {
+        this.multiplayerEnabled = multiplayerEnabled;
     }
 
     public HeroAircraft getHeroAircraft() {
