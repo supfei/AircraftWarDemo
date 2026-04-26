@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     private MultiplayerSessionManager sessionManager;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private Runnable scoreSyncTask;
+    private String gameMode = "easy";
+    private boolean localGameFinished;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 获取从主菜单传过来的游戏模式
         Intent intent = getIntent();
-        String gameMode = intent.getStringExtra("game_mode");
+        gameMode = intent.getStringExtra("game_mode");
         isMultiplayer = intent.getBooleanExtra("is_multiplayer", false);
         roomId = intent.getStringExtra("room_id");
         playerId = intent.getStringExtra("player_id");
@@ -48,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
         gameView = new GameView(this, gameMode, soundEnable);
         gameView.setMultiplayerEnabled(isMultiplayer);
         gameView.setEnemyScore(-1);
+        gameView.setEnemyHp(-1);
+        gameView.setGameOverCallback(this::handleLocalGameOver);
 
         // 设置为全屏
         getWindow().setFlags(
@@ -62,6 +66,43 @@ public class MainActivity extends AppCompatActivity {
             sessionManager = new MultiplayerSessionManager();
             startScoreSyncLoop();
         }
+    }
+
+    private void handleLocalGameOver(int finalScore) {
+        if (!isMultiplayer) {
+            return;
+        }
+        if (localGameFinished) {
+            return;
+        }
+        localGameFinished = true;
+        stopScoreSyncLoop();
+        if (sessionManager != null) {
+            sessionManager.finishBattle(roomId, playerId, finalScore, gameView.getCurrentHp(), new MultiplayerSessionManager.SimpleCallback() {
+                @Override
+                public void onSuccess() {
+                    openMatchResultPage(finalScore);
+                }
+
+                @Override
+                public void onFailure(String error) {
+                    openMatchResultPage(finalScore);
+                }
+            });
+        } else {
+            openMatchResultPage(finalScore);
+        }
+    }
+
+    private void openMatchResultPage(int finalScore) {
+        Intent intent = new Intent(MainActivity.this, MatchResultActivity.class);
+        intent.putExtra(MatchResultActivity.EXTRA_ROOM_ID, roomId);
+        intent.putExtra(MatchResultActivity.EXTRA_PLAYER_ID, playerId);
+        intent.putExtra(MatchResultActivity.EXTRA_GAME_MODE, gameMode);
+        intent.putExtra(MatchResultActivity.EXTRA_LOCAL_SCORE, finalScore);
+        startActivity(intent);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        finish();
     }
 
     @Override
@@ -118,12 +159,17 @@ public class MainActivity extends AppCompatActivity {
                 if (sessionManager == null || gameView == null) {
                     return;
                 }
+                if (localGameFinished) {
+                    return;
+                }
                 int localScore = gameView.getCurrentScore();
-                sessionManager.syncScore(roomId, playerId, localScore, new MultiplayerSessionManager.ScoreSyncCallback() {
+                int localHp = gameView.getCurrentHp();
+                sessionManager.syncScore(roomId, playerId, localScore, localHp, false, new MultiplayerSessionManager.ScoreSyncCallback() {
                     @Override
-                    public void onSuccess(int enemyScore) {
+                    public void onSuccess(MultiplayerSessionManager.ScoreSyncResponse response) {
                         if (gameView != null) {
-                            gameView.setEnemyScore(enemyScore);
+                            gameView.setEnemyScore(response.enemyScore);
+                            gameView.setEnemyHp(response.enemyHp);
                         }
                         handler.postDelayed(scoreSyncTask, 400);
                     }

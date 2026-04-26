@@ -58,6 +58,7 @@ public class GameController {
     // ========== 游戏状态 ==========
     protected int score = 0;
     protected int enemyScore = -1;
+    protected int enemyHp = -1;
     protected boolean multiplayerEnabled = false;
     protected int time = 0;
     protected int timeInterval = 40; // 刷新间隔（毫秒）
@@ -340,9 +341,14 @@ public class GameController {
         }
         canvas.drawText(scoreLine, 30, 100, paint);
 
-        // 绘制生命值
+        // 绘制生命值（联机时同一行显示对方血量）
         if (heroAircraft != null) {
-            canvas.drawText("LIFE: " + heroAircraft.getHp(), 30, 150, paint);
+            String lifeLine = "LIFE: " + heroAircraft.getHp();
+            if (multiplayerEnabled) {
+                String enemyHpText = enemyHp >= 0 ? String.valueOf(enemyHp) : "--";
+                lifeLine = lifeLine + "    ENEMY HP: " + enemyHpText;
+            }
+            canvas.drawText(lifeLine, 20, 100, paint);
         }
 
         // 游戏结束时显示Game Over
@@ -400,6 +406,14 @@ public class GameController {
 
     public int getEnemyScore() {
         return enemyScore;
+    }
+
+    public void setEnemyHp(int enemyHp) {
+        this.enemyHp = enemyHp;
+    }
+
+    public int getEnemyHp() {
+        return enemyHp;
     }
 
     public void setMultiplayerEnabled(boolean multiplayerEnabled) {
