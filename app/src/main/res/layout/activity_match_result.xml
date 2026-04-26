@@ -12,16 +12,27 @@
         android:scaleType="centerCrop"
         android:src="@drawable/bg_over" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#70000000" />
+
     <TextView
         android:id="@+id/tv_result_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="130dp"
+        android:layout_marginTop="150dp"
         android:fontFamily="serif"
         android:text="对战结果"
         android:textColor="@android:color/white"
-        android:textSize="70sp"
+        android:textSize="82sp"
         android:textStyle="bold"
+
+        android:shadowColor="#000000"
+        android:shadowDx="8"
+        android:shadowDy="8"
+        android:shadowRadius="6"
+
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -30,56 +41,108 @@
         android:id="@+id/tv_result_desc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="40dp"
         android:fontFamily="serif"
         android:text="等待对方结束..."
         android:textColor="#FDD835"
-        android:textSize="34sp"
+        android:textSize="50sp"
         android:textStyle="bold"
+        android:shadowColor="#FF0000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="20"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_result_title" />
 
-    <TextView
-        android:id="@+id/tv_my_score"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/ll_score_board"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:fontFamily="serif"
-        android:text="我的得分: 0"
-        android:textColor="@android:color/white"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_result_desc" />
+        android:layout_marginTop="40dp"
+        android:layout_marginHorizontal="30dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/tv_result_desc">
 
-    <TextView
-        android:id="@+id/tv_enemy_score"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:fontFamily="serif"
-        android:text="对方得分: 0"
-        android:textColor="@android:color/white"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_my_score" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="YOU"
+                android:textColor="#B0FFFFFF"
+                android:textSize="20sp"
+                android:letterSpacing="0.2" />
+
+            <TextView
+                android:id="@+id/tv_my_score"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="serif"
+                android:text="1000"
+                android:textColor="#00E5FF"
+                android:textSize="45sp"
+                android:textStyle="bold"
+                android:shadowColor="#00E5FF"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="15" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="1.5dp"
+            android:layout_height="50dp"
+            android:background="#40FFFFFF" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ENEMY"
+                android:textColor="#B0FFFFFF"
+                android:textSize="20sp"
+                android:letterSpacing="0.2" />
+
+            <TextView
+                android:id="@+id/tv_enemy_score"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="serif"
+                android:text="1000"
+                android:textColor="#FDD835"
+                android:textSize="45sp"
+                android:textStyle="bold"
+                android:shadowColor="#FF0000"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="15" />
+        </LinearLayout>
+    </LinearLayout>
 
     <Button
         android:id="@+id/btn_exit"
         android:layout_width="220dp"
         android:layout_height="60dp"
-        android:layout_marginTop="42dp"
+        android:layout_marginTop="50dp"
         android:enabled="false"
         android:fontFamily="serif"
-        android:text="退出"
+        android:text="继续"
         android:textSize="25sp"
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_enemy_score" />
+        app:layout_constraintTop_toBottomOf="@id/ll_score_board" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
