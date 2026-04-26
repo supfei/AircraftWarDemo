@@ -58,6 +58,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     private boolean soundEnabled = false;
     private boolean multiplayerEnabled = false;
     private int enemyScore = -1;
+    private int enemyHp = -1;
 
     // 屏幕尺寸
     private int screenWidth;
@@ -146,7 +147,13 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     // 实现GameController.GameOverListener接口的方法
     @Override
     public void onGameOver(int finalScore) {
-        runOnUiThreadSafely(() -> openGameOverPage(finalScore));
+        runOnUiThreadSafely(() -> {
+            if (multiplayerEnabled && gameOverCallback != null) {
+                gameOverCallback.onGameOver(finalScore);
+            } else {
+                openGameOverPage(finalScore);
+            }
+        });
     }
 
     // 跳转到独立游戏结束页
@@ -343,6 +350,7 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
             HeroAircraft.getInstance().setGame(gameController);
             gameController.setMultiplayerEnabled(multiplayerEnabled);
             gameController.setEnemyScore(enemyScore);
+            gameController.setEnemyHp(enemyHp);
         }
 
         // 设置屏幕尺寸
@@ -377,11 +385,25 @@ public class GameView extends SurfaceView implements Runnable, SurfaceHolder.Cal
         }
     }
 
+    public void setEnemyHp(int enemyHp) {
+        this.enemyHp = enemyHp;
+        if (gameController != null) {
+            gameController.setEnemyHp(enemyHp);
+        }
+    }
+
     public int getCurrentScore() {
         if (gameController == null) {
             return 0;
         }
         return gameController.getScore();
+    }
+
+    public int getCurrentHp() {
+        if (gameController == null || gameController.getHeroAircraft() == null) {
+            return 0;
+        }
+        return Math.max(gameController.getHeroAircraft().getHp(), 0);
     }
 
     /**

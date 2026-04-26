@@ -124,20 +124,59 @@ public class MultiplayerSessionManager {
         });
     }
 
-    public void syncScore(String roomId, String playerId, int myScore, ScoreSyncCallback callback) {
-        ScoreSyncRequest request = new ScoreSyncRequest(roomId, playerId, myScore);
+    public void syncScore(String roomId, String playerId, int myScore, int myHp, boolean finished, ScoreSyncCallback callback) {
+        ScoreSyncRequest request = new ScoreSyncRequest(roomId, playerId, myScore, myHp, finished);
         matchApiService.syncScore(request).enqueue(new Callback<ScoreSyncResponse>() {
             @Override
             public void onResponse(Call<ScoreSyncResponse> call, Response<ScoreSyncResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    callback.onSuccess(response.body().enemyScore);
+                    callback.onSuccess(response.body());
                 } else {
-                    callback.onFailure("同步分数失败");
+                    callback.onFailure("同步对战状态失败");
                 }
             }
 
             @Override
             public void onFailure(Call<ScoreSyncResponse> call, Throwable t) {
+                String error = t.getMessage() == null ? "网络错误" : t.getMessage();
+                callback.onFailure(error);
+            }
+        });
+    }
+
+    public void finishBattle(String roomId, String playerId, int myScore, int myHp, SimpleCallback callback) {
+        ScoreSyncRequest request = new ScoreSyncRequest(roomId, playerId, myScore, myHp, true);
+        matchApiService.finishBattle(request).enqueue(new Callback<SimpleResponse>() {
+            @Override
+            public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess();
+                } else {
+                    callback.onFailure("提交结算失败");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SimpleResponse> call, Throwable t) {
+                String error = t.getMessage() == null ? "网络错误" : t.getMessage();
+                callback.onFailure(error);
+            }
+        });
+    }
+
+    public void getMatchResult(String roomId, String playerId, MatchResultCallback callback) {
+        matchApiService.getMatchResult(roomId, playerId).enqueue(new Callback<MatchResultResponse>() {
+            @Override
+            public void onResponse(Call<MatchResultResponse> call, Response<MatchResultResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onFailure("获取对战结果失败");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MatchResultResponse> call, Throwable t) {
                 String error = t.getMessage() == null ? "网络错误" : t.getMessage();
                 callback.onFailure(error);
             }
@@ -160,7 +199,12 @@ public class MultiplayerSessionManager {
     }
 
     public interface ScoreSyncCallback {
-        void onSuccess(int enemyScore);
+        void onSuccess(ScoreSyncResponse response);
+        void onFailure(String error);
+    }
+
+    public interface MatchResultCallback {
+        void onSuccess(MatchResultResponse response);
         void onFailure(String error);
     }
 
@@ -187,6 +231,15 @@ public class MultiplayerSessionManager {
 
         @POST("/api/match/score/sync")
         Call<ScoreSyncResponse> syncScore(@Body ScoreSyncRequest request);
+
+        @POST("/api/match/score/finish")
+        Call<SimpleResponse> finishBattle(@Body ScoreSyncRequest request);
+
+        @GET("/api/match/result/status")
+        Call<MatchResultResponse> getMatchResult(
+                @Query("room_id") String roomId,
+                @Query("player_id") String playerId
+        );
     }
 
     public static class RoomCreateRequest {
@@ -225,16 +278,32 @@ public class MultiplayerSessionManager {
         public final String roomId;
         public final String playerId;
         public final int myScore;
+        public final int myHp;
+        public final boolean finished;
 
-        public ScoreSyncRequest(String roomId, String playerId, int myScore) {
+        public ScoreSyncRequest(String roomId, String playerId, int myScore, int myHp, boolean finished) {
             this.roomId = roomId;
             this.playerId = playerId;
             this.myScore = myScore;
+            this.myHp = myHp;
+            this.finished = finished;
         }
     }
 
     public static class ScoreSyncResponse {
         public int enemyScore;
+        public int enemyHp;
+        public boolean enemyFinished;
+        public boolean bothFinished;
+        public String winner;
+    }
+
+    public static class MatchResultResponse {
+        public boolean bothFinished;
+        public int myScore;
+        public int enemyScore;
+        public String winner;
+        public boolean youWin;
     }
 
     public static class RoomStatusResponse {
