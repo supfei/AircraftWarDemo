@@ -348,7 +348,7 @@ public class GameController {
                 String enemyHpText = enemyHp >= 0 ? String.valueOf(enemyHp) : "--";
                 lifeLine = lifeLine + "    ENEMY HP: " + enemyHpText;
             }
-            canvas.drawText(lifeLine, 20, 100, paint);
+            canvas.drawText(lifeLine, 31, 150, paint);
         }
 
         // 游戏结束时显示Game Over

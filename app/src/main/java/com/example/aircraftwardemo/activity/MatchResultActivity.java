@@ -1,6 +1,7 @@
 package com.example.aircraftwardemo.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -57,8 +58,8 @@ public class MatchResultActivity extends AppCompatActivity {
 
         tvResultTitle.setText("对战结果");
         tvResultDesc.setText("等待对方结束...");
-        tvMyScore.setText("我的得分: " + localScore);
-        tvEnemyScore.setText("对方得分: --");
+        tvMyScore.setText("" + localScore);
+        tvEnemyScore.setText("--");
         btnExit.setEnabled(false);
 
         btnExit.setOnClickListener(v -> openGameOverPage());
@@ -76,15 +77,21 @@ public class MatchResultActivity extends AppCompatActivity {
                 sessionManager.getMatchResult(roomId, playerId, new MultiplayerSessionManager.MatchResultCallback() {
                     @Override
                     public void onSuccess(MultiplayerSessionManager.MatchResultResponse response) {
-                        tvMyScore.setText("我的得分: " + response.myScore);
-                        tvEnemyScore.setText("对方得分: " + response.enemyScore);
+                        tvMyScore.setText("" + response.myScore);
+                        tvEnemyScore.setText("" + response.enemyScore);
                         if (response.bothFinished) {
                             if (response.youWin) {
                                 tvResultDesc.setText("YOU WIN");
+                                tvResultDesc.setTextColor(Color.YELLOW);
+                                tvResultDesc.setShadowLayer(30, 0, 0, Color.YELLOW);
                             } else if ("draw".equals(response.winner)) {
                                 tvResultDesc.setText("DRAW");
+                                tvResultDesc.setTextColor(Color.WHITE);
+                                tvResultDesc.setShadowLayer(30, 0, 0, Color.WHITE);
                             } else {
                                 tvResultDesc.setText("YOU LOSE");
+                                tvResultDesc.setTextColor(Color.RED);
+                                tvResultDesc.setShadowLayer(30, 0, 0, Color.RED);
                             }
                             btnExit.setEnabled(true);
                             return;
