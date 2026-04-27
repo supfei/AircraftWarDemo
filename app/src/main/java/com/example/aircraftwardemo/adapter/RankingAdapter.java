@@ -46,7 +46,20 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.ViewHold
         }
 
         ScoreRecord record = scoreList.get(position);
-        holder.tvRank.setText(String.valueOf(position + 1));
+
+        // --- 修改开始：处理前三名的图标 ---
+        int rank = position + 1;
+        if (rank == 1) {
+            holder.tvRank.setText("🥇");
+        } else if (rank == 2) {
+            holder.tvRank.setText("🥈");
+        } else if (rank == 3) {
+            holder.tvRank.setText("🥉");
+        } else {
+            holder.tvRank.setText(String.valueOf(rank));
+        }
+        // --- 修改结束 ---
+
         holder.tvName.setText(record.getName());
         holder.tvScore.setText(String.valueOf(record.getScore()));
         holder.tvDate.setText(record.getDate());

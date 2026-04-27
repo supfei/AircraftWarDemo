@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:fontFamily="serif"
-        android:text="历史最高: 0"
+        android:text="👑历史最高: 0"
         android:textColor="#FDD835"
         android:textSize="26sp"
         android:textStyle="bold"
