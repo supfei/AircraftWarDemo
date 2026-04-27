@@ -111,6 +111,8 @@
         android:textStyle="bold"
         android:fontFamily="serif"
         android:layout_marginTop="30dp"
+        app:strokeColor="#FFFFFF"
+        app:strokeWidth="4dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_online" />
