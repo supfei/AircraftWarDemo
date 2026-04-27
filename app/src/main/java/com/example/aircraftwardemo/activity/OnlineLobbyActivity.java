@@ -180,7 +180,6 @@ public class OnlineLobbyActivity extends AppCompatActivity {
                         btnStartGame.setEnabled(isMatched && isHost);
 
                         if (response.started) {
-                            gameStarted = true;
                             enterMultiplayerGame();
                             return;
                         }
@@ -205,6 +204,12 @@ public class OnlineLobbyActivity extends AppCompatActivity {
     }
 
     private void enterMultiplayerGame() {
+        if (gameStarted) {
+            return;
+        }
+        gameStarted = true;
+        stopPollingRoomStatus();
+
         Intent intent = new Intent(OnlineLobbyActivity.this, MainActivity.class);
         intent.putExtra("game_mode", gameMode);
         intent.putExtra("is_multiplayer", true);

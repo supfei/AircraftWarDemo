@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * @author 有朝宿云
@@ -30,6 +31,7 @@ public class ScoreDaoImpl implements ScoreDao {
     private final ExecutorService dbExecutor;
     private final Object cacheLock = new Object();
     private final List<ScoreRecord> cache = new ArrayList<>();
+    private volatile boolean cacheInitialized;
 
     public ScoreDaoImpl(Context context) {
         this.context = context.getApplicationContext();
@@ -54,6 +56,7 @@ public class ScoreDaoImpl implements ScoreDao {
 
     @Override
     public List<ScoreRecord> getAllScores() {
+        ensureCacheInitialized();
         synchronized (cacheLock) {
             return new ArrayList<>(cache);
         }
@@ -111,6 +114,19 @@ public class ScoreDaoImpl implements ScoreDao {
         synchronized (cacheLock) {
             cache.clear();
             cache.addAll(latest);
+        }
+        cacheInitialized = true;
+    }
+
+    private void ensureCacheInitialized() {
+        if (cacheInitialized) {
+            return;
+        }
+        try {
+            Future<?> future = dbExecutor.submit(this::refreshCacheFromDb);
+            future.get();
+        } catch (Exception e) {
+            Log.e(TAG, "Load scores from DB failed", e);
         }
     }
 

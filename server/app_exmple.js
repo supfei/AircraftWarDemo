@@ -517,12 +517,12 @@ app.post("/api/match/score/sync", async (req, res) => {
 
     if (room.host_player_id === pid) {
       await pool.execute(
-        "UPDATE match_rooms SET host_score = ?, host_hp = ?, host_finished = ? WHERE room_id = ?",
+        "UPDATE match_rooms SET host_score = ?, host_hp = ?, host_finished = CASE WHEN host_finished = 1 OR ? = 1 THEN 1 ELSE 0 END WHERE room_id = ?",
         [safeScore, safeHp, safeFinished ? 1 : 0, roomId]
       );
     } else if (room.guest_player_id === pid) {
       await pool.execute(
-        "UPDATE match_rooms SET guest_score = ?, guest_hp = ?, guest_finished = ? WHERE room_id = ?",
+        "UPDATE match_rooms SET guest_score = ?, guest_hp = ?, guest_finished = CASE WHEN guest_finished = 1 OR ? = 1 THEN 1 ELSE 0 END WHERE room_id = ?",
         [safeScore, safeHp, safeFinished ? 1 : 0, roomId]
       );
     } else {
