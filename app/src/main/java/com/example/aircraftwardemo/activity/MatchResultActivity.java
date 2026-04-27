@@ -81,7 +81,7 @@ public class MatchResultActivity extends AppCompatActivity {
                         tvEnemyScore.setText("" + response.enemyScore);
                         if (response.bothFinished) {
                             if (response.youWin) {
-                                tvResultDesc.setText("YOU WIN");
+                                tvResultDesc.setText("✨YOU WIN!✨");
                                 tvResultDesc.setTextColor(Color.YELLOW);
                                 tvResultDesc.setShadowLayer(30, 0, 0, Color.YELLOW);
                             } else if ("draw".equals(response.winner)) {
@@ -89,7 +89,7 @@ public class MatchResultActivity extends AppCompatActivity {
                                 tvResultDesc.setTextColor(Color.WHITE);
                                 tvResultDesc.setShadowLayer(30, 0, 0, Color.WHITE);
                             } else {
-                                tvResultDesc.setText("YOU LOSE");
+                                tvResultDesc.setText("☠YOU LOSE☠");
                                 tvResultDesc.setTextColor(Color.RED);
                                 tvResultDesc.setShadowLayer(30, 0, 0, Color.RED);
                             }
